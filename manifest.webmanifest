@@ -1,6 +1,6 @@
 {
-  "name": "Minecraft Block Analyzer",
-  "short_name": "MBA",
+  "name": "MBA-Database",
+  "short_name": "MBA-Database",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#FFAA00",

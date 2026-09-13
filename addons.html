@@ -1,0 +1,2326 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MBA-Database</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#202020">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MBA-Database">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+
+
+
+
+<style>
+@font-face{
+  font-family:"BestTen CRT";
+  src:
+    url("./BestTen-CRT.otf") format("opentype"),
+    url("./Best10-FONT/BestTen-CRT.otf") format("opentype");
+  font-display:block;
+}
+:root{
+  font-family:"BestTen CRT","Courier New",monospace;
+  --orange:#F8B400;
+  --blue:#0072C3;
+  --yellow:#FFE20A;
+  --black:#000000;
+  --white:#FFFFFF;
+  --ink:#111111;
+  --muted:#5d6670;
+  --paper:#FFFFFF;
+  --soft:#F5F7FA;
+  --line:#D9E1E8;
+  --green:#65C85A;
+  --red:#E76060;
+}
+*{
+  box-sizing:border-box;
+  font-family:"BestTen CRT","Courier New",monospace !important;
+}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--ink);
+  background:
+    linear-gradient(180deg,#E9F4FA 0%,#F3F6F9 36%,#EDF1F4 100%);
+}
+.wrap{max-width:1200px;margin:0 auto;padding:14px 12px 44px}
+.card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:17px;
+  margin-bottom:13px;
+  box-shadow:0 7px 18px rgba(24,50,75,.07);
+}
+.card:first-child{
+  min-height:0; aspect-ratio:16/9;
+  position:relative;
+  overflow:hidden;
+  border:0;
+  border-radius:20px;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  color:var(--white);
+  background:
+    linear-gradient(116deg,var(--orange) 0 35%,var(--blue) 35% 100%);
+  box-shadow:0 13px 28px rgba(0,82,140,.20);
+}
+.card:first-child:before{display:none}
+.card:first-child:after{display:none}
+
+h2{
+  font-size:18px;
+  margin:0 0 12px;
+  font-weight:400;
+  letter-spacing:0;
+}
+.small{
+  font-size:11px;
+  line-height:1.55;
+  color:var(--muted);
+}
+.card:first-child .small{
+  position:relative;
+  z-index:2;
+  color:var(--white);
+  font-size:12px;
+  text-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,input,textarea{font:inherit}
+button{
+  min-height:42px;
+  padding:9px 13px;
+  border:2px solid #20242A;
+  border-radius:9px;
+  background:#FFFFFF;
+  color:#151515;
+  font-weight:400;
+  box-shadow:0 4px 0 #20242A;
+}
+button:active{
+  transform:translateY(3px);
+  box-shadow:0 1px 0 #20242A;
+}
+button.primary{
+  background:var(--yellow);
+  color:#000;
+  border-color:#000;
+  box-shadow:0 4px 0 #000;
+}
+button.primary:active{box-shadow:0 1px 0 #000}
+button:disabled{opacity:.4;box-shadow:none}
+input[type=file]{
+  max-width:100%;
+  padding:7px;
+  border:2px dashed #AEBBC7;
+  border-radius:9px;
+  background:#F7FAFD;
+}
+input[type=text],textarea{
+  padding:10px 11px;
+  border:2px solid #BBC7D1;
+  border-radius:9px;
+  background:#FFFFFF;
+  color:#111;
+  outline:none;
+}
+input[type=text]:focus,textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(0,114,195,.13);
+}
+textarea{width:100%;min-height:100px;resize:vertical}
+.status,.dictStat{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#E7F3FC;
+  color:#005B9A;
+  border:1px solid #BEDDF2;
+  font-size:10px;
+}
+.list{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(286px,1fr));
+  gap:11px;
+}
+.item{
+  position:relative;
+  padding:11px;
+  border:1px solid #DCE4EC;
+  border-radius:13px;
+  background:#FFF;
+  box-shadow:0 5px 14px rgba(35,58,82,.055);
+  overflow:hidden;
+}
+.item:after{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:0;height:4px;
+  background:#B8C6D4;
+}
+.item.ok:after{background:var(--green)}
+.item.warn:after{background:var(--orange)}
+.item.fail:after{background:var(--red)}
+.thumb{
+  width:112px;
+  height:112px;
+  image-rendering:pixelated;
+  border:2px solid #30343A;
+  border-radius:8px;
+  background:
+    linear-gradient(45deg,#E8EBEE 25%,transparent 25%),
+    linear-gradient(-45deg,#E8EBEE 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#E8EBEE 75%),
+    linear-gradient(-45deg,transparent 75%,#E8EBEE 75%),
+    #FFF;
+  background-size:16px 16px;
+  background-position:0 0,0 8px,8px -8px,-8px 0;
+  margin-bottom:7px;
+}
+.nameInput,.idInput{width:100%;margin-top:6px}
+.badge{
+  display:inline-flex;
+  margin-left:7px;
+  padding:4px 7px;
+  border-radius:999px;
+  font-size:10px;
+}
+.badge.ok{background:#E2F7E4;color:#277A2C}
+.badge.warn{background:#FFF0CB;color:#8B5C00}
+.badge.fail{background:#FFE2E2;color:#9D3333}
+.grid2{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(300px,.85fr);
+  gap:12px;
+}
+canvas{
+  max-width:100%;
+  border:2px solid #30343A;
+  border-radius:10px;
+  background:#20272A;
+  touch-action:none;
+}
+#editPreview{
+  width:180px;
+  height:180px;
+  image-rendering:pixelated;
+}
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(20,29,40,.72);
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+}
+.modalBox{
+  background:#FFF;
+  max-width:960px;
+  width:100%;
+  max-height:94vh;
+  overflow:auto;
+  border-radius:17px;
+  padding:15px;
+  box-shadow:0 24px 70px rgba(0,0,0,.28);
+}
+
+.cropModeRow{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:8px 0}
+.cropModeRow button.active{background:#FFE928;border-color:#171717}
+.cropHint{padding:8px 10px;border-radius:10px;background:#DDF1FF;border:2px solid #171717;margin-bottom:8px}
+.nudgePad{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(74px,1fr));
+  grid-template-areas:
+    ". up ."
+    "left . right"
+    ". down .";
+  gap:6px;
+  max-width:360px;
+}
+.nudgePad button{width:100%;min-width:0}
+.nudgeUp{grid-area:up}
+.nudgeLeft{grid-area:left}
+.nudgeRight{grid-area:right}
+.nudgeDown{grid-area:down}
+
+#loupeWrap{
+  position:fixed;
+  right:12px;
+  top:12px;
+  z-index:150;
+  display:none;
+  background:#FFF;
+  border:2px solid #30343A;
+  border-radius:11px;
+  padding:6px;
+  pointer-events:none;
+}
+#loupe{
+  width:180px;
+  height:180px;
+  border-radius:8px;
+  border:0;
+  background:#111;
+  image-rendering:pixelated;
+}
+.helpCompact{
+  margin-top:7px;
+  border-top:1px solid #E4E9EF;
+}
+.helpCompact summary{
+  cursor:pointer;
+  list-style:none;
+  padding:6px 1px 3px;
+  font-size:9px;
+  color:#89919B;
+}
+.helpCompact summary::-webkit-details-marker{display:none}
+.helpCompact summary:after{content:" ＋"}
+.helpCompact[open] summary:after{content:" −"}
+.helpCompact .small{
+  padding:2px 0 3px;
+  font-size:9px;
+  color:#9198A1;
+}
+.suggest{
+  position:absolute;
+  left:11px;
+  right:11px;
+  z-index:20;
+  background:#FFF;
+  border:2px solid #20242A;
+  border-radius:10px;
+  box-shadow:4px 4px 0 rgba(32,36,42,.28);
+  max-height:min(52vh,420px);
+  overflow:auto;
+  display:none;
+}
+.suggest button{
+  width:100%;
+  border:0;
+  border-bottom:1px solid #EDF0F4;
+  border-radius:0;
+  text-align:left;
+  padding:9px 10px;
+  background:#FFF;
+  box-shadow:none;
+}
+.item>.small{
+  margin:2px 0 4px;
+  font-size:10px;
+}
+.item>button{margin-top:7px;margin-right:5px}
+.card:nth-of-type(2) h2:before,
+.card:nth-of-type(3) h2:before,
+.card:nth-of-type(4) h2:before,
+.card:nth-of-type(5) h2:before{
+  display:inline-grid;
+  place-items:center;
+  width:25px;
+  height:25px;
+  margin-right:8px;
+  border-radius:7px;
+  background:var(--orange);
+  color:#000;
+  border:2px solid #000;
+  box-shadow:2px 2px 0 #000;
+  font-size:10px;
+}
+.card:nth-of-type(2) h2:before{content:"01"}
+.card:nth-of-type(3) h2:before{content:"02";background:var(--blue);color:#FFF}
+.card:nth-of-type(4) h2:before{content:"03";background:#65C85A}
+.card:nth-of-type(5) h2:before{content:"04";background:var(--yellow)}
+@media(max-width:800px){
+  .wrap{padding:10px 9px 32px}
+  .card{padding:14px;border-radius:14px}
+  .card:first-child{min-height:0; aspect-ratio:16/9;padding:0}
+  
+  .grid2{grid-template-columns:1fr}
+  .list{grid-template-columns:1fr}
+  .thumb{width:106px;height:106px}
+  button{min-height:44px}
+}
+
+.headerImageWrap{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  overflow:hidden;
+}
+.headerImage{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+}
+.card:first-child .small{
+  display:none !important;
+}
+
+
+/* Logo-palette page theme */
+:root{
+  --logo-blue:#1689F4;
+  --logo-blue-dark:#0067B8;
+  --logo-blue-light:#DDF1FF;
+  --logo-orange:#FFAA00;
+  --logo-orange-dark:#E78C00;
+  --logo-orange-light:#FFF0C9;
+  --logo-yellow:#FFE928;
+  --logo-black:#171717;
+  --logo-white:#FFFFFF;
+  --ink:#171717;
+  --muted:#5D6670;
+  --paper:#FFFFFF;
+  --soft:#F4F8FC;
+  --line:#C9D9E6;
+  --green:#72C95B;
+  --red:#E76060;
+}
+body{
+  background:
+    radial-gradient(circle at 12% 4%,rgba(255,233,40,.28),transparent 20%),
+    radial-gradient(circle at 88% 8%,rgba(22,137,244,.20),transparent 24%),
+    linear-gradient(135deg,#FFF0C9 0 18%,#F8FBFF 18% 64%,#DDF1FF 64% 100%);
+  background-attachment:fixed;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(circle,rgba(255,170,0,.20) 0 3px,transparent 3.5px) 14px 16px/22px 22px,
+    linear-gradient(135deg,transparent 0 78%,rgba(0,103,184,.055) 78% 82%,transparent 82% 100%);
+  mask-image:linear-gradient(90deg,#000 0 14%,transparent 30% 72%,#000 90%);
+  -webkit-mask-image:linear-gradient(90deg,#000 0 14%,transparent 30% 72%,#000 90%);
+}
+.card:not(:first-child){
+  background:rgba(255,255,255,.96);
+  border-color:#C9D9E6;
+  box-shadow:0 7px 18px rgba(0,103,184,.09);
+}
+.card:nth-of-type(2){border-top:5px solid var(--logo-orange)}
+.card:nth-of-type(3){border-top:5px solid var(--logo-blue)}
+.card:nth-of-type(4){border-top:5px solid var(--logo-yellow)}
+.card:nth-of-type(5){border-top:5px solid var(--logo-blue-dark)}
+button{
+  border-color:#26333D;
+  background:#FFFFFF;
+  color:#171717;
+  box-shadow:0 4px 0 #26333D;
+}
+button.primary{
+  background:var(--logo-yellow);
+  color:#111;
+  border-color:var(--logo-black);
+  box-shadow:0 4px 0 var(--logo-black);
+}
+input[type=text],textarea{
+  background:#FFFFFF;
+  border-color:#AFC8DA;
+}
+input[type=text]:focus,textarea:focus{
+  border-color:var(--logo-blue);
+  box-shadow:0 0 0 3px rgba(22,137,244,.14);
+}
+.status,.dictStat{
+  background:var(--logo-blue-light);
+  color:#005EAA;
+  border-color:#A8D5F4;
+}
+.helpCompact{
+  border-top-color:#D3E3EE;
+}
+.suggest{
+  border-color:#26333D;
+}
+.card:nth-of-type(2) h2:before{background:var(--logo-orange);color:#111}
+.card:nth-of-type(3) h2:before{background:var(--logo-blue);color:#fff}
+.card:nth-of-type(4) h2:before{background:var(--logo-yellow);color:#111}
+.card:nth-of-type(5) h2:before{background:var(--logo-blue-dark);color:#fff}
+
+
+/* Large autocomplete candidate panel */
+.suggest,
+.suggestions,
+.autocomplete-list,
+.autocomplete-results,
+.dropdown-list,
+.search-suggestions {
+  max-height: min(52vh, 420px) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+.suggest > *,
+.suggestions > *,
+.autocomplete-list > *,
+.autocomplete-results > *,
+.dropdown-list > *,
+.search-suggestions > * {
+  min-height: 44px;
+}
+
+
+
+/* Balanced result cards */
+.item{
+  position:relative;
+  display:grid;
+  grid-template-columns:112px minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+  overflow:visible !important;
+  padding:12px;
+}
+.item .thumb{
+  width:112px;
+  height:112px;
+  margin:0;
+}
+.resultMain{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+.resultMain .badge{
+  align-self:flex-start;
+  margin:0;
+  position:static;
+}
+.nameFieldWrap{
+  position:relative;
+  min-width:0;
+}
+.nameFieldWrap .nameInput,
+.resultMain .idInput{
+  width:100%;
+  margin:0;
+}
+.nameFieldWrap .suggest{
+  left:0;
+  right:0;
+  top:calc(100% + 4px);
+  max-height:min(42vh,360px) !important;
+  overflow-y:auto !important;
+  z-index:80;
+}
+.resultActions{
+  display:grid;
+  grid-template-columns:1fr 1fr 0.82fr;
+  gap:7px;
+  margin-top:1px;
+}
+.resultActions button{
+  min-height:40px;
+  padding:7px 9px;
+  margin:0 !important;
+  font-size:12px;
+  box-shadow:2px 2px 0 #24313A;
+}
+.item:focus-within{z-index:70}
+
+@media(max-width:800px){
+  .item{
+    grid-template-columns:96px minmax(0,1fr);
+    gap:10px;
+    padding:10px;
+  }
+  .item .thumb{
+    width:96px;
+    height:96px;
+  }
+  .resultMain{gap:6px}
+  .resultActions{gap:5px}
+  .resultActions button{
+    min-height:36px;
+    padding:6px 7px;
+    font-size:11px;
+  }
+  .nameFieldWrap .suggest{
+    max-height:min(36vh,300px) !important;
+  }
+}
+
+
+/* Two-step flow: upload page -> results page */
+.view{display:none}
+.view.active{display:block}
+#uploadView .card{max-width:760px;margin-left:auto;margin-right:auto}
+#resultsView .topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:8px 0 14px;
+}
+#resultsView .topbar button{
+  min-height:38px;
+  padding:7px 12px;
+  font-size:12px;
+}
+
+
+/* iPhone / PWA top safe-area spacing */
+:root{
+  --app-safe-top: env(safe-area-inset-top, 0px);
+}
+body{
+  padding-top: calc(var(--app-safe-top) + 14px);
+}
+header,
+.header,
+.hero,
+.logoWrap,
+.header-logo-wrap{
+  scroll-margin-top: calc(var(--app-safe-top) + 14px);
+}
+@media (display-mode: standalone){
+  body{
+    padding-top: calc(var(--app-safe-top) + 18px);
+  }
+}
+
+#editCanvas{touch-action:none;}
+
+/* v171 companion-app visual direction */
+body{background:linear-gradient(#087ac8,#23a6f3 46%,#0b74bd);background-attachment:fixed;}
+.wrap{max-width:820px;}
+.companionHeader{background:linear-gradient(135deg,#ffd51c,#ff9d00);border:3px solid #171717;border-radius:24px;padding:10px 12px;box-shadow:0 7px 0 rgba(0,0,0,.28);position:relative;margin-bottom:16px}
+.companionHeader .headerImageWrap{position:relative!important;inset:auto!important;width:100%;aspect-ratio:1672/941;border:0!important;background:transparent!important;box-shadow:none!important;border-radius:14px;overflow:hidden}
+.companionHeader .headerImage{display:block!important;position:static!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;border-radius:13px}
+.headerChip{position:absolute;right:18px;bottom:14px;background:#087bd0;color:#fff;border:3px solid #171717;border-radius:12px;padding:6px 10px;font-size:11px;box-shadow:2px 3px 0 #171717}
+.nextBlockCard{background:linear-gradient(145deg,#fff,#dff3ff);border:3px solid #171717;border-radius:22px;padding:18px;margin:0 0 16px;box-shadow:0 6px 0 rgba(0,0,0,.28);position:relative;overflow:hidden}
+.nextBlockCard:after{content:'';position:absolute;width:110px;height:110px;border-radius:24px;background:#ffe429;right:-35px;top:-45px;transform:rotate(22deg);opacity:.9}
+.nextEyebrow{display:inline-block;background:#ffe429;border:2px solid #171717;border-radius:999px;padding:5px 11px;font-size:12px;position:relative;z-index:1}.nextName{font-size:25px;font-weight:900;margin-top:12px;position:relative;z-index:1}.nextMeta{font-size:11px;color:#405261;margin-top:5px;position:relative;z-index:1}.progressTrack{height:10px;background:#c7d9e5;border:2px solid #171717;border-radius:999px;margin-top:14px;overflow:hidden;position:relative;z-index:1}.progressTrack span{display:block;height:100%;background:#ffae00}
+.homePanel{background:linear-gradient(145deg,#ffdd29,#ffa60b);border:3px solid #171717;border-radius:22px;margin:0 0 15px;box-shadow:0 6px 0 rgba(0,0,0,.28);overflow:hidden}.homePanel summary{list-style:none;display:grid;grid-template-columns:54px 1fr 28px;align-items:center;gap:12px;padding:16px;cursor:pointer}.homePanel summary::-webkit-details-marker{display:none}.homePanel summary b{display:block;font-size:22px}.homePanel summary small{display:block;font-size:11px;margin-top:2px}.homePanel summary i{font-style:normal;font-size:38px;font-weight:900;transition:.2s}.homePanel[open] summary i{transform:rotate(90deg)}.panelIcon{display:grid;place-items:center;width:50px;height:50px;background:#fff;border:3px solid #171717;border-radius:14px;font-size:27px;box-shadow:3px 3px 0 #171717}.panelBody{background:#fff;border-top:3px solid #171717;padding:16px}.dbPanel{background:linear-gradient(145deg,#ffe832,#ffc10d)}.dbActions{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.dbActions .small{grid-column:1/-1}.dbActions button{background:#fff}.dbActions button:disabled{opacity:.55}
+#uploadView>.card{display:none!important}
+#uploadView{padding-bottom:20px}
+@media(max-width:600px){.wrap{padding-left:10px;padding-right:10px}.companionHeader{border-radius:19px;padding:8px}.nextBlockCard,.homePanel{border-radius:18px}.homePanel summary{grid-template-columns:48px 1fr 24px;padding:13px}.panelIcon{width:44px;height:44px}.homePanel summary b{font-size:19px}.dbActions{grid-template-columns:1fr 1fr 1fr}.headerChip{font-size:9px;right:12px;bottom:10px}}
+
+
+/* v174 Companion UI — results + manual correction */
+#resultsView{max-width:860px;margin:0 auto;padding-bottom:24px}
+#resultsView .topbar{
+  display:grid;grid-template-columns:auto 1fr;align-items:center;gap:12px;
+  margin:6px 0 14px;padding:12px 14px;border:4px solid #171717;border-radius:24px;
+  background:linear-gradient(135deg,#FFE928,#FFAA00);box-shadow:0 7px 0 rgba(23,23,23,.30)
+}
+#resultsView .topbar .small{justify-self:end;display:inline-flex;align-items:center;padding:5px 10px;border:2px solid #171717;border-radius:999px;background:#1689F4;color:#fff}
+#resultsView .topbar button{min-height:42px;padding:8px 12px;border:3px solid #171717;border-radius:14px;background:#fff;box-shadow:0 4px 0 #171717}
+#resultsView>.card{margin-bottom:16px;padding:15px;border:4px solid #171717;border-radius:26px;background:#fff;box-shadow:0 8px 0 rgba(0,79,140,.28)}
+#resultsView>.card:first-of-type{border-top:8px solid #FFE928}
+#resultsView>.card:last-of-type{border-top:8px solid #FFAA00}
+#resultsView>.card h2{margin:0 0 13px;font-size:22px}
+#resultsView .list{display:grid;grid-template-columns:1fr;gap:12px;counter-reset:result-card}
+#resultsView .item{position:relative;display:grid;grid-template-columns:112px minmax(0,1fr);gap:13px;align-items:center;padding:13px;border:3px solid #171717;border-radius:20px;background:linear-gradient(135deg,#fff 0 78%,#EAF6FF 78% 100%);box-shadow:0 5px 0 rgba(23,23,23,.20);overflow:visible!important}
+#resultsView .item:after{display:none!important}
+#resultsView .item:before{content:counter(result-card,decimal-leading-zero);counter-increment:result-card;position:absolute;left:-8px;top:-9px;z-index:3;display:grid;place-items:center;min-width:34px;height:30px;padding:0 6px;border:3px solid #171717;border-radius:10px;background:#FFE928;box-shadow:2px 2px 0 #171717;font-size:10px}
+#resultsView .thumb{width:112px;height:112px;margin:0;border:4px solid #171717;border-radius:16px;box-shadow:3px 3px 0 rgba(23,23,23,.22)}
+#resultsView .resultMain{gap:7px}
+#resultsView .badge{margin:0;padding:5px 10px;border:2px solid #171717;border-radius:999px;font-size:10px;box-shadow:1px 2px 0 rgba(23,23,23,.18)}
+#resultsView .nameInput,#resultsView .idInput{min-height:44px;border:3px solid #AFC8DA;border-radius:13px;background:#fff;font-size:14px}
+#resultsView .nameInput:focus,#resultsView .idInput:focus{border-color:#1689F4}
+#resultsView .resultActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#resultsView .resultActions button{min-height:42px;border:3px solid #171717;border-radius:13px;box-shadow:0 4px 0 #171717;font-size:12px}
+#resultsView .resultActions button:first-child{background:#FFE928}
+#resultsView .resultActions button:last-child{background:#fff}
+#resultsView>.card:last-of-type .row{display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:9px}
+#resultsView>.card:last-of-type button{min-height:48px;border:3px solid #171717;border-radius:14px;box-shadow:0 4px 0 #171717}
+#resultsView #exportZip{background:#FFE928}
+
+/* Manual correction becomes part of the same visual language */
+#editModal{background:rgba(0,68,119,.58);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:12px}
+#editModal .modalBox{width:min(980px,100%);max-height:94vh;overflow:auto;padding:14px;border:4px solid #171717;border-radius:26px;background:linear-gradient(180deg,#EAF6FF,#fff 30%);box-shadow:0 10px 0 rgba(23,23,23,.32)}
+#editModal .modalBox>.row:first-child{position:sticky;top:-14px;z-index:8;margin:-14px -14px 12px;padding:12px 14px;background:linear-gradient(135deg,#FFE928,#FFAA00);border-bottom:4px solid #171717}
+#editModal #editTitle{font-size:20px}
+#editModal #closeEdit{background:#fff;border:3px solid #171717;border-radius:13px;box-shadow:0 4px 0 #171717}
+#editModal .grid2{gap:14px!important;align-items:start}
+#editModal #editCanvas{display:block;width:100%;height:auto;border:4px solid #171717;border-radius:18px;background:#111;box-shadow:0 5px 0 rgba(23,23,23,.22)}
+#editModal .cropModeRow{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px}
+#editModal .cropModeRow button{min-height:44px;text-align:left;border:3px solid #171717;border-radius:14px;background:#fff;box-shadow:0 4px 0 #171717}
+#editModal .cropModeRow button.active{background:#FFE928}
+#editModal .cropHint{margin:8px 0;padding:10px 12px;border:3px solid #1689F4;border-radius:14px;background:#DDF1FF;color:#123b5a}
+#editModal #nudgePanel{margin-top:10px!important;padding:10px!important;border:3px solid #171717!important;border-radius:16px!important;background:#FFF0C9!important;box-shadow:0 4px 0 rgba(23,23,23,.18)}
+#editModal .nudgePad button{min-height:44px;border:3px solid #171717;border-radius:13px;background:#fff;box-shadow:0 4px 0 #171717}
+#editModal #editPreview{display:block;width:min(256px,100%);height:auto;margin:12px auto;border:4px solid #171717;border-radius:16px;background:#222;image-rendering:pixelated;box-shadow:0 5px 0 rgba(23,23,23,.22)}
+#editModal #saveEdit{background:#FFE928;border:3px solid #171717;box-shadow:0 4px 0 #171717}
+#editModal #applyAll{background:#1689F4;color:#fff;border:3px solid #171717;box-shadow:0 4px 0 #171717}
+#loupeWrap{border:4px solid #171717!important;border-radius:18px!important;background:#FFE928!important;box-shadow:0 5px 0 #171717!important;padding:4px!important}
+#loupe{border-radius:12px!important}
+
+@media(max-width:600px){
+ #resultsView .topbar{grid-template-columns:1fr;gap:9px;padding:11px;border-radius:20px}
+ #resultsView .topbar .small{justify-self:start}
+ #resultsView .topbar button{width:100%}
+ #resultsView>.card{padding:12px;border-radius:21px}
+ #resultsView .item{grid-template-columns:92px minmax(0,1fr);gap:10px;padding:10px;border-radius:17px}
+ #resultsView .thumb{width:92px;height:92px;border-radius:13px}
+ #resultsView .resultActions button{min-height:38px;padding:6px;font-size:11px}
+ #resultsView .nameInput,#resultsView .idInput{min-height:40px;font-size:12px}
+ #resultsView>.card:last-of-type .row{grid-template-columns:1fr 1fr}
+ #resultsView #exportZip{grid-column:1/-1}
+ #editModal{padding:6px;align-items:flex-start}
+ #editModal .modalBox{padding:10px;border-radius:20px;max-height:97vh}
+ #editModal .modalBox>.row:first-child{top:-10px;margin:-10px -10px 10px;padding:10px}
+ #editModal .grid2{grid-template-columns:1fr!important}
+ #editModal #editTitle{font-size:16px;max-width:72%}
+ #editModal #editPreview{width:192px}
+}
+
+
+
+/* v175 — spacious fixed header + carousel results */
+:root{--appHeaderH:74px}
+body{padding-top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 18px)!important}
+.appFixedHeader{position:fixed;z-index:9000;top:0;left:0;right:0;height:calc(var(--appHeaderH) + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);background:linear-gradient(180deg,#FFCC21,#FFAA00);border-bottom:4px solid #171717;box-shadow:0 5px 0 rgba(23,23,23,.25);display:flex;align-items:center;justify-content:space-between;gap:12px;padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}
+.appBrand{min-width:0;display:flex;align-items:center;gap:10px}.appBrandMark{width:42px;height:42px;border:3px solid #171717;border-radius:12px;background:#1689F4;box-shadow:0 3px 0 #171717;display:grid;place-items:center;font-size:20px;color:#fff}.appBrandText{min-width:0}.appBrandText b{display:block;font-size:18px;line-height:1}.appBrandText small{display:block;margin-top:5px;font-size:9px;opacity:.7;letter-spacing:.08em}
+.menuWrap{position:relative}.menuButton{width:48px;height:48px;padding:0!important;border:3px solid #171717!important;border-radius:14px!important;background:#fff!important;box-shadow:0 4px 0 #171717!important;display:grid!important;place-items:center!important;font-size:26px!important;line-height:1!important}.menuDropdown{position:absolute;right:0;top:58px;width:210px;padding:10px;border:3px solid #171717;border-radius:18px;background:#fff;box-shadow:0 7px 0 rgba(23,23,23,.28);display:none}.menuDropdown.open{display:grid;gap:8px}.menuDropdown button{width:100%;min-height:48px;border:3px solid #171717;border-radius:13px;background:#fff;box-shadow:0 3px 0 #171717;font-size:13px;text-align:left;padding:10px 14px}.menuDropdown button:first-child{background:#FFE928}
+.view{padding-left:18px!important;padding-right:18px!important}.companionHeader,.nextBlockCard,.homePanel,#resultsView>.card{margin-bottom:28px!important}.nextBlockCard{padding:28px!important}.homePanel summary{padding:22px 20px!important}.homePanel .panelBody{padding:24px 20px 28px!important}.homePanel .row{gap:14px!important}.homePanel .row+*{margin-top:14px!important}.helpCompact{margin-top:18px!important}.dbActions{gap:14px!important}
+#resultsView{max-width:920px!important;padding-bottom:44px!important}
+#resultsView .topbar{display:none!important}
+#resultsView>.card{padding:24px!important;border-radius:28px!important}
+#resultsView>.card h2{margin:0 0 22px!important;font-size:24px!important}
+#resultsView .list{display:flex!important;grid-template-columns:none!important;gap:18px!important;overflow-x:auto!important;overflow-y:visible!important;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:8px 8px 18px!important;margin:0 -8px;scrollbar-width:none}
+#resultsView .list::-webkit-scrollbar{display:none}
+#resultsView .item{flex:0 0 calc(100% - 16px)!important;width:calc(100% - 16px)!important;scroll-snap-align:center;scroll-snap-stop:always;grid-template-columns:122px minmax(0,1fr)!important;gap:18px!important;padding:20px!important;border-radius:22px!important}
+#resultsView .thumb{width:122px!important;height:122px!important}
+#resultsView .resultMain{gap:11px!important}
+#resultsView .resultActions{gap:12px!important}
+#resultsView>.card:last-of-type .row{gap:14px!important}
+.resultCarouselHint{font-size:10px;color:#526474;margin:-10px 0 12px;padding-left:4px}
+.modalBox{padding:24px!important;border-radius:26px!important}.modalBox>.row:first-child{margin-bottom:18px!important}.grid2{gap:22px!important}.cropModeRow{gap:10px!important;margin-bottom:12px!important}.cropHint{margin:12px 0!important;padding:12px!important;border-radius:12px;background:#EAF6FF}.nudgePad{gap:10px!important}#nudgePanel{padding:14px!important;margin-top:14px!important}.modalBox .row{gap:12px!important}
+.settingsSheet{position:fixed;z-index:10050;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;padding:18px}.settingsSheet.open{display:flex}.settingsCard{width:min(620px,100%);background:#fff;border:4px solid #171717;border-radius:26px;padding:22px;box-shadow:0 8px 0 #171717}.settingsCard h2{margin:0 0 10px}.settingsCard p{margin:0 0 18px;color:#526474}.settingsCard button{width:100%;min-height:48px;border:3px solid #171717;border-radius:14px;background:#FFE928;box-shadow:0 4px 0 #171717}
+@media(max-width:600px){:root{--appHeaderH:66px}.appBrandText b{font-size:15px}.appBrandText small{font-size:8px}.appBrandMark{width:38px;height:38px}.menuButton{width:44px;height:44px!important}.view{padding-left:14px!important;padding-right:14px!important}.companionHeader,.nextBlockCard,.homePanel,#resultsView>.card{margin-bottom:22px!important}.nextBlockCard{padding:22px!important}.homePanel summary{padding:18px 16px!important}.homePanel .panelBody{padding:20px 16px 24px!important}#resultsView>.card{padding:18px!important}#resultsView .item{flex-basis:calc(100% - 10px)!important;width:calc(100% - 10px)!important;grid-template-columns:96px minmax(0,1fr)!important;gap:13px!important;padding:15px!important}#resultsView .thumb{width:96px!important;height:96px!important}.modalBox{padding:17px!important}.grid2{gap:16px!important}}
+
+
+
+/* v176 — footer, carousel dots, modal scroll isolation, compact pop nudge */
+#resultsView .list{
+  gap:0!important;
+  padding:8px 0 10px!important;
+  margin:0!important;
+  overflow-x:auto!important;
+  overscroll-behavior-x:contain;
+}
+#resultsView .item{
+  flex:0 0 100%!important;
+  width:100%!important;
+  scroll-snap-align:start!important;
+  box-sizing:border-box!important;
+}
+#resultsView>.card:first-of-type{overflow:hidden}
+.carouselDots{display:flex;align-items:center;justify-content:center;gap:8px;min-height:24px;margin:8px 0 0}
+.carouselDots button{appearance:none;width:8px;height:8px;min-width:8px;padding:0!important;border:0!important;border-radius:999px;background:#AFC8DA;box-shadow:none!important;transition:width .18s ease,background .18s ease,transform .18s ease}
+.carouselDots button.active{width:24px;background:#1689F4;transform:scaleY(1.15)}
+.carouselCount{text-align:center;font-size:9px;color:#526474;margin-top:2px}
+
+.appFooter{max-width:920px;margin:34px auto 22px;padding:0 18px 28px}
+.footerCard{background:#fff;border:4px solid #171717;border-radius:26px;box-shadow:0 8px 0 rgba(23,23,23,.25);overflow:hidden}
+.footerHead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;background:linear-gradient(135deg,#1689F4,#0067B8);color:#fff;border-bottom:4px solid #171717}
+.footerHead strong{font-size:18px}.footerMore{min-height:38px!important;padding:7px 12px!important;border:3px solid #171717!important;border-radius:12px!important;background:#FFE928!important;box-shadow:0 3px 0 #171717!important;color:#171717!important;font-size:10px!important}
+.updateList{display:grid;padding:8px 16px 10px}
+.updateRow{display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;align-items:start;padding:12px 2px;border-bottom:1px solid #D9E4EC}
+.updateRow:last-child{border-bottom:0}.updateTag{display:inline-grid;place-items:center;min-height:28px;padding:4px 7px;border:2px solid #171717;border-radius:9px;background:#DDF1FF;font-size:8px}.updateRow:nth-child(2) .updateTag{background:#FFF0C9}.updateRow:nth-child(3) .updateTag{background:#E8F7E2}
+.updateText b{display:block;font-size:11px;margin-bottom:3px}.updateText small{font-size:9px;color:#607182;line-height:1.5}
+.footerBottom{display:flex;justify-content:center;padding:12px 16px 16px;background:#F3FAFF;border-top:2px solid #D9E4EC}.footerBack{width:min(320px,100%);min-height:48px!important;border:3px solid #171717!important;border-radius:14px!important;background:#fff!important;box-shadow:0 4px 0 #171717!important;font-size:12px!important}
+
+.historySheet{position:fixed;z-index:10080;inset:0;background:rgba(0,0,0,.48);display:none;align-items:flex-end;justify-content:center;padding:18px}.historySheet.open{display:flex}.historyCard{width:min(680px,100%);max-height:min(78vh,760px);overflow:auto;-webkit-overflow-scrolling:touch;background:#fff;border:4px solid #171717;border-radius:26px;padding:18px;box-shadow:0 8px 0 #171717}.historyTitle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.historyTitle h2{margin:0}.historyClose{min-height:40px!important;padding:7px 12px!important;border:3px solid #171717!important;border-radius:12px!important;background:#FFE928!important;box-shadow:0 3px 0 #171717!important}.historyEntries{display:grid;gap:10px}.historyEntry{padding:12px;border:3px solid #171717;border-radius:15px;background:#F7FBFE}.historyEntry b{display:block;margin-bottom:4px}.historyEntry small{color:#607182;line-height:1.5}
+
+/* Keep the correction screen below the fixed header and scroll only inside it. */
+#editModal{z-index:8500!important;top:calc(var(--appHeaderH) + env(safe-area-inset-top))!important;bottom:0!important;height:auto!important;align-items:stretch!important;justify-content:center!important;padding:12px 12px max(12px,env(safe-area-inset-bottom))!important;overflow:hidden!important;overscroll-behavior:contain!important}
+#editModal .modalBox{max-height:none!important;height:100%!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;touch-action:pan-y!important;padding:22px!important}
+#editModal .modalBox>.row:first-child{position:sticky!important;top:-22px!important;z-index:20!important;margin:-22px -22px 16px!important;padding:14px 18px!important;background:linear-gradient(180deg,#FFCC21,#FFAA00)!important;border-bottom:4px solid #171717!important}
+#editModal #closeEdit{min-height:40px!important;padding:6px 12px!important;background:#fff!important;border:3px solid #171717!important;border-radius:12px!important;box-shadow:0 3px 0 #171717!important}
+body.editOpen{overflow:hidden!important}
+#editCanvas{touch-action:none!important}
+
+#nudgePanel{max-width:300px!important;margin:14px auto 18px!important;padding:12px!important;border:4px solid #171717!important;border-radius:20px!important;background:linear-gradient(145deg,#FFF0C9,#FFE928)!important;box-shadow:0 5px 0 rgba(23,23,23,.23)!important}
+#nudgeTarget{text-align:center!important;font-size:9px!important;margin-bottom:6px!important}
+.nudgePad{max-width:240px!important;margin:6px auto 0!important;gap:7px!important;grid-template-columns:repeat(3,1fr)!important}
+.nudgePad button{min-height:46px!important;height:46px!important;padding:5px!important;border:3px solid #171717!important;border-radius:13px!important;box-shadow:0 3px 0 #171717!important;font-size:11px!important}
+.nudgeUp,.nudgeDown{background:#DDF1FF!important}.nudgeLeft{background:#fff!important}.nudgeRight{background:#FFBE38!important}
+.cropModeRow button{min-height:48px!important;padding:7px 8px!important;border:3px solid #171717!important;border-radius:14px!important;box-shadow:0 3px 0 #171717!important;font-size:10px!important}.cropModeRow button.active{background:#FFE928!important}
+
+@media(max-width:600px){
+  #resultsView .item{grid-template-columns:96px minmax(0,1fr)!important;padding:15px!important}
+  .appFooter{padding-left:14px;padding-right:14px;margin-top:26px}.footerCard{border-radius:22px}.footerHead{padding:14px}.footerHead strong{font-size:15px}.updateRow{grid-template-columns:64px minmax(0,1fr);gap:9px}.updateText b{font-size:10px}.updateText small{font-size:8px}
+  #editModal{padding:8px 8px max(8px,env(safe-area-inset-bottom))!important}
+  #editModal .modalBox{padding:16px!important;border-radius:22px!important}
+  #editModal .modalBox>.row:first-child{top:-16px!important;margin:-16px -16px 14px!important;padding:12px 14px!important}
+  .cropModeRow{gap:7px!important}.cropModeRow button{font-size:9px!important;min-height:44px!important;padding:6px!important}
+  #nudgePanel{max-width:270px!important}.nudgePad{max-width:215px!important}.nudgePad button{height:43px!important;min-height:43px!important;font-size:10px!important}
+}
+
+
+/* v177 — polish pass */
+.carouselViewport{overflow:hidden;width:100%;border-radius:22px}
+#resultsView .list{width:100%!important;max-width:100%!important;box-sizing:border-box!important}
+#resultsView .item{min-width:100%!important;max-width:100%!important;margin:0!important;overflow:hidden!important}
+#resultsView .item:before{left:0!important;top:0!important;border-top-left-radius:18px!important}
+.carouselDots{gap:7px!important;min-height:18px!important;margin:10px 0 0!important}
+.carouselDots button{width:6px!important;height:6px!important;min-width:6px!important;background:rgba(0,0,0,.28)!important;transition:transform .16s ease,background .16s ease!important}
+.carouselDots button.active{width:6px!important;height:6px!important;background:rgba(0,0,0,.68)!important;transform:scale(1.5)!important}
+.carouselCount{display:none!important}
+.resultActions{display:grid!important;grid-template-columns:1fr 1fr!important}
+.resultActions .dbRegisterBtn{grid-column:1/-1!important;background:#1689F4!important;color:#fff!important;border-color:#171717!important}
+.resultActions .dbRegisterBtn.registered{background:#DFF5D8!important;color:#276737!important}
+.resultActions .dbRegisterBtn:disabled{background:#E4E8EC!important;color:#7A8792!important;border-color:#AAB4BC!important;box-shadow:0 3px 0 #AAB4BC!important;cursor:not-allowed!important}
+.resultActions .dbRegisterBtn.registered:disabled{background:#DFF5D8!important;color:#276737!important;border-color:#171717!important;box-shadow:0 4px 0 #171717!important}
+.dbRegisterSummary{margin:0 0 14px;padding:10px 12px;border:3px solid #171717;border-radius:14px;background:#FFF4C7;font-size:11px;line-height:1.55}
+.dbRegisterSummary.ok{background:#E5F6DF}.dbRegisterSummary.fail{background:#FFE4E0}.dbRegisterSummary button{margin:3px 4px 0 0;padding:3px 7px;min-height:28px;border:2px solid #171717;border-radius:8px;background:#fff;font:inherit}
+.item.dbRegistered{box-shadow:0 5px 0 rgba(39,103,55,.28)!important}.dbStateLabel{display:inline-flex;align-items:center;width:max-content;padding:4px 8px;border:2px solid #171717;border-radius:999px;background:#DFF5D8;color:#276737;font-size:9px}
+
+/* Footer mirrors the fixed header: update history left, back button right. */
+.appFooter{max-width:none!important;margin:40px 0 0!important;padding:0 0 max(10px,env(safe-area-inset-bottom))!important}
+.footerCard{border:0!important;border-top:4px solid #171717!important;border-bottom:4px solid #171717!important;border-radius:0!important;box-shadow:0 -4px 0 rgba(23,23,23,.18)!important;background:linear-gradient(180deg,#FFCC21,#FFAA00)!important;display:grid!important;grid-template-columns:minmax(0,1fr) 92px!important;align-items:stretch!important;overflow:visible!important}
+.footerLeft{min-width:0;padding:12px max(12px,env(safe-area-inset-left)) 12px 16px}
+.footerHead{padding:0 0 7px!important;background:none!important;color:#171717!important;border:0!important;justify-content:flex-start!important;gap:10px!important}
+.footerHead strong{font-size:14px!important}.footerMore{min-height:28px!important;padding:3px 8px!important;border:2px solid #171717!important;border-radius:9px!important;background:#fff!important;box-shadow:0 2px 0 #171717!important;font-size:8px!important}
+.updateList{padding:0!important;display:grid!important;gap:3px!important}.updateRow{display:grid!important;grid-template-columns:42px minmax(0,1fr)!important;gap:6px!important;padding:2px 0!important;border:0!important;align-items:center!important}.updateTag{min-height:19px!important;padding:1px 4px!important;border:2px solid #171717!important;border-radius:6px!important;font-size:6px!important;background:#fff!important}.updateText b{font-size:8px!important;margin:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.updateText small{display:none!important}
+.footerBottom{padding:10px max(12px,env(safe-area-inset-right)) 10px 8px!important;background:none!important;border:0!important;display:grid!important;place-items:center!important}.footerBack{width:64px!important;height:64px!important;min-height:64px!important;padding:0!important;border:3px solid #171717!important;border-radius:17px!important;background:#fff!important;box-shadow:0 5px 0 #171717!important;font-size:24px!important;display:grid!important;place-items:center!important}.footerBack span{display:block;font-size:8px;line-height:1;margin-top:-10px}
+
+/* Correction workspace */
+#editModal{touch-action:none!important}
+#editModal .modalBox{touch-action:pan-y!important;overflow-y:auto!important;overscroll-behavior-y:contain!important}
+.editWorkspace{display:grid;gap:14px}.editCanvasWrap{width:100%;overflow:hidden;border-radius:18px}.editCanvasWrap canvas{display:block;max-width:100%;height:auto;margin:0 auto}
+.fineTuneRow{display:grid;grid-template-columns:minmax(0,1fr) 116px;gap:12px;align-items:center}
+.nudgePanelCompact{justify-self:start;width:min(250px,100%);padding:9px!important;border:3px solid #171717!important;border-radius:16px!important;background:#DDF1FF!important;box-shadow:0 4px 0 rgba(23,23,23,.18)!important;transition:opacity .15s ease}
+.nudgePanelCompact.inactive{opacity:.48}
+.nudgePanelCompact .small{font-size:8px;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nudgePad{display:grid!important;grid-template-columns:42px 42px 42px!important;grid-template-areas:". up ." "left . right" ". down ."!important;gap:4px!important;justify-content:start!important}
+.nudgePad button{width:42px!important;height:34px!important;min-height:34px!important;padding:0!important;border:2px solid #171717!important;border-radius:9px!important;background:#fff!important;color:#171717!important;box-shadow:0 2px 0 #171717!important;font-size:15px!important}
+.nudgeUp{grid-area:up}.nudgeLeft{grid-area:left}.nudgeRight{grid-area:right}.nudgeDown{grid-area:down}
+.previewMini{justify-self:end;display:grid;justify-items:center;gap:5px;padding:7px;border:3px solid #171717;border-radius:15px;background:#171717;color:#fff;box-shadow:0 4px 0 rgba(23,23,23,.18)}.previewMini span{font-size:7px}.previewMini #editPreview{width:88px!important;height:88px!important;margin:0!important;border:0!important;border-radius:7px!important;background:#222!important;image-rendering:pixelated}
+.cropModeRow{display:grid!important;grid-template-columns:1fr!important;gap:8px!important;margin:0!important}.cropModeRow button{min-height:48px!important}.cropModeRow button.active{background:#FFE928!important}.workflowNote{margin:0 2px}.editSaveRow{margin-top:2px!important}
+@media(max-width:600px){
+ .footerCard{grid-template-columns:minmax(0,1fr) 78px!important}.footerLeft{padding-left:12px!important}.footerBack{width:56px!important;height:56px!important;min-height:56px!important;border-radius:15px!important}
+ .fineTuneRow{grid-template-columns:minmax(0,1fr) 102px;gap:8px}.nudgePanelCompact{width:190px!important;padding:8px!important}.nudgePad{grid-template-columns:36px 36px 36px!important}.nudgePad button{width:36px!important;height:31px!important;min-height:31px!important}.previewMini #editPreview{width:76px!important;height:76px!important}
+}
+
+
+/* v178 — requested layout/detail fixes */
+.appBrandText b{font-size:23px!important;letter-spacing:.02em}.appBrandText small{font-size:9px!important}.appBrandMark svg,.panelIcon svg{width:62%;height:62%;fill:none;stroke:currentColor;stroke-width:1.8}.appBrandMark svg path,.panelIcon svg path{fill:currentColor;stroke:none}.panelIcon svg circle{fill:none;stroke:currentColor;stroke-width:2}
+.resultsTitleRow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.resultsTitleRow h2{margin:0!important}.registerAllDB{min-height:42px!important;padding:7px 12px!important;border:3px solid #171717!important;border-radius:13px!important;background:#1689F4!important;color:#fff!important;box-shadow:0 4px 0 #171717!important;font-size:9px!important;white-space:nowrap}
+.carouselDots{gap:7px!important}.carouselDots button{box-sizing:border-box!important;display:block!important;width:7px!important;height:7px!important;min-width:7px!important;max-width:7px!important;min-height:7px!important;max-height:7px!important;aspect-ratio:1/1!important;padding:0!important;margin:0!important;border:0!important;border-radius:50%!important;background:rgba(0,0,0,.26)!important;box-shadow:none!important;transform:none!important}.carouselDots button.active{width:7px!important;height:7px!important;min-width:7px!important;max-width:7px!important;background:rgba(0,0,0,.65)!important;transform:scale(1.45)!important}
+/* blue footer, flush to page bottom */
+.appFooter{margin:34px 0 0!important;padding:0!important}.footerCard{background:linear-gradient(180deg,#1689F4,#0067B8)!important;color:#fff!important;border-bottom:0!important}.footerHead{color:#fff!important}.footerMore{color:#171717!important}.updateText b{color:#fff!important}.updateTag{color:#171717!important}.footerBottom{background:none!important}.footerBack{color:#171717!important}
+/* equal split: nudge / preview */
+.fineTuneRow{grid-template-columns:1fr 1fr!important;gap:12px!important;align-items:stretch!important}.nudgePanelCompact,.previewMini{width:100%!important;max-width:none!important;justify-self:stretch!important;box-sizing:border-box!important;min-height:132px!important}.nudgePanelCompact{background:#DDF1FF!important;display:flex!important;flex-direction:column!important;justify-content:center!important}.previewMini{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;background:#171717!important}.previewMini #editPreview{width:min(104px,78%)!important;height:auto!important;aspect-ratio:1/1!important}
+.nudgePad{grid-template-columns:44px 44px 44px!important;grid-template-rows:38px 38px 38px!important;gap:5px!important;justify-content:center!important;margin:4px auto 0!important}.nudgePad button{width:44px!important;height:38px!important;min-height:38px!important;border:2px solid #171717!important;border-radius:10px!important;background:#FFE928!important;color:#171717!important;box-shadow:0 3px 0 #171717!important;font-size:19px!important;font-weight:900!important}.nudgePanelCompact.inactive{opacity:.62!important}
+/* loupe must float above correction content/header */
+#loupeWrap{position:fixed!important;z-index:12050!important;top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 12px)!important;right:max(12px,env(safe-area-inset-right))!important;left:auto!important;bottom:auto!important;pointer-events:none!important;background:#FFE928!important;border:4px solid #171717!important;box-shadow:0 6px 0 rgba(23,23,23,.3)!important}
+@media(max-width:600px){.appBrandText b{font-size:19px!important}.appBrandText small{font-size:7px!important}.appBrandMark{width:42px!important;height:42px!important}.resultsTitleRow{align-items:center}.registerAllDB{font-size:8px!important;padding:6px 9px!important;min-height:38px!important}.fineTuneRow{gap:8px!important}.nudgePanelCompact,.previewMini{min-height:116px!important}.nudgePad{grid-template-columns:38px 38px 38px!important;grid-template-rows:34px 34px 34px!important;gap:4px!important}.nudgePad button{width:38px!important;height:34px!important;min-height:34px!important;font-size:17px!important}.previewMini #editPreview{width:min(86px,76%)!important}}
+
+
+/* v179 — user supplied brand art + balanced fine tune */
+.appBrandLogo{height:64px!important;max-width:min(520px,calc(100vw - 100px))!important;overflow:hidden!important;display:flex!important;align-items:center!important}
+.appBrandLogo img{display:block!important;width:auto!important;height:92px!important;max-width:none!important;object-fit:cover!important;object-position:center 56%!important;clip-path:inset(20% 0 20% 0)!important;margin:-18px 0!important}
+.appFixedHeader{min-height:82px!important}
+:root{--appHeaderH:82px!important}
+.fineTuneRow{grid-template-columns:1fr 1fr!important;align-items:stretch!important;gap:10px!important}
+.nudgePanelCompact,.previewMini{height:154px!important;min-height:154px!important;padding:9px!important}
+.nudgePanelCompact{background:#1689F4!important;border-color:#171717!important}
+.nudgePanelCompact .small{color:#fff!important}
+.nudgePad{grid-template-columns:46px 46px 46px!important;grid-template-rows:40px 40px 40px!important;gap:5px!important}
+.nudgePad button{width:46px!important;height:40px!important;min-height:40px!important;background:#FFE928!important;color:#171717!important}
+.previewMini{background:#171717!important}
+.previewMini #editPreview{width:min(132px,94%)!important;height:min(132px,94%)!important;max-width:132px!important;max-height:132px!important;aspect-ratio:1/1!important;image-rendering:pixelated!important}
+@media(max-width:600px){.appBrandLogo{height:56px!important;max-width:calc(100vw - 92px)!important}.appBrandLogo img{height:80px!important}.appFixedHeader{min-height:74px!important}:root{--appHeaderH:74px!important}.nudgePanelCompact,.previewMini{height:132px!important;min-height:132px!important}.nudgePad{grid-template-columns:39px 39px 39px!important;grid-template-rows:35px 35px 35px!important;gap:4px!important}.nudgePad button{width:39px!important;height:35px!important;min-height:35px!important}.previewMini #editPreview{width:min(112px,96%)!important;height:min(112px,96%)!important}}
+
+/* v180 — integrated text logo, app-wide search, fine-tune alignment */
+:root{--appHeaderH:104px!important}
+.appFixedHeader{
+  min-height:104px!important;height:calc(var(--appHeaderH) + env(safe-area-inset-top))!important;
+  display:grid!important;grid-template-columns:minmax(180px,330px) minmax(180px,1fr) auto!important;
+  align-items:center!important;gap:14px!important;
+}
+.appBrandLogo{display:none!important}
+.appBrandTextLogo{min-width:0;display:flex;flex-direction:column;justify-content:center;line-height:.82;transform:translateY(-1px)}
+.appBrandTextLogo span{display:block;white-space:nowrap;font-family:"BestTen CRT","Courier New",monospace!important;font-weight:900;letter-spacing:-.045em;
+  background:linear-gradient(180deg,#FFF83A 0%,#FFE30D 48%,#F7A600 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:2px #171717;text-shadow:0 3px 0 #7A2E00,0 5px 0 #171717,2px 0 0 #171717,-2px 0 0 #171717;
+}
+.brandMinecraft{font-size:31px}.brandAnalyzer{font-size:24px;margin-top:7px;letter-spacing:-.035em!important}
+.appSearchWrap{position:relative;min-width:0;height:48px;display:flex;align-items:center;background:#fff;border:3px solid #171717;border-radius:15px;box-shadow:0 4px 0 #171717;overflow:visible}
+.searchIcon{width:42px;display:grid;place-items:center;font-size:22px;color:#171717;flex:0 0 auto}
+.appSearch{min-width:0;width:100%;height:100%;border:0!important;box-shadow:none!important;padding:0 34px 0 0!important;background:transparent!important;font-size:13px!important;color:#171717!important;outline:none!important}
+.appSearch::-webkit-search-cancel-button{display:none}
+.clearAppSearch{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:29px!important;height:29px!important;min-height:29px!important;padding:0!important;border:0!important;border-radius:50%!important;background:#DDF1FF!important;box-shadow:none!important;font-size:18px!important;display:none!important}
+.appSearchWrap.hasValue .clearAppSearch{display:grid!important;place-items:center!important}
+.appSearchResults{position:absolute;z-index:14000;left:-3px;right:-3px;top:56px;display:none;max-height:min(56vh,440px);overflow:auto;-webkit-overflow-scrolling:touch;background:#fff;border:3px solid #171717;border-radius:16px;box-shadow:0 7px 0 rgba(23,23,23,.28);padding:7px}
+.appSearchResults.open{display:grid;gap:6px}
+.searchResult{width:100%;min-height:48px!important;text-align:left!important;padding:8px 10px!important;border:2px solid #171717!important;border-radius:11px!important;background:#fff!important;box-shadow:0 2px 0 #171717!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important;align-items:center!important}
+.searchResult strong{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.searchResult small{display:block;font-size:7px;color:#617184;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.searchResult em{font-style:normal;font-size:6px;padding:3px 5px;border-radius:999px;background:#DDF1FF;color:#005B9A;white-space:nowrap}.searchResult.action em{background:#FFE928;color:#171717}
+/* Fine tune: exact same box and baseline */
+.fineTuneRow{grid-template-columns:1fr 1fr!important;gap:10px!important;align-items:stretch!important}
+#nudgePanel.nudgePanelCompact,.previewMini{height:152px!important;min-height:152px!important;max-height:152px!important;margin:0!important;align-self:stretch!important;justify-self:stretch!important;box-sizing:border-box!important}
+#nudgePanel.nudgePanelCompact{background:#1689F4!important;border-color:#171717!important;padding:8px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+#nudgePanel .small{color:#fff!important;margin:0 0 5px!important;text-align:left!important}
+.nudgePad{margin:0 auto!important}
+.previewMini{padding:7px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important}
+.previewMini span{flex:0 0 auto;margin:0 0 4px!important}
+.previewMini #editPreview{width:min(132px,calc(100% - 6px))!important;height:auto!important;max-height:125px!important;margin:0!important}
+@media(max-width:720px){
+ :root{--appHeaderH:124px!important}
+ .appFixedHeader{min-height:124px!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-rows:58px 48px!important;gap:7px 10px!important;padding-bottom:8px!important}
+ .appBrandTextLogo{grid-column:1;grid-row:1}.menuWrap{grid-column:2;grid-row:1}.appSearchWrap{grid-column:1 / -1;grid-row:2;width:100%;height:44px}
+ .brandMinecraft{font-size:25px}.brandAnalyzer{font-size:20px;margin-top:6px}.appBrandTextLogo span{-webkit-text-stroke:1.6px #171717;text-shadow:0 2px 0 #7A2E00,0 4px 0 #171717,1px 0 0 #171717,-1px 0 0 #171717}
+ .appSearchResults{top:50px}
+ #nudgePanel.nudgePanelCompact,.previewMini{height:128px!important;min-height:128px!important;max-height:128px!important}
+ .previewMini #editPreview{width:min(108px,calc(100% - 4px))!important;max-height:103px!important}
+}
+
+
+/* v181 — compact readable header, settings, NEXT filters, bottom footer */
+html,body{min-height:100%}body{min-height:100dvh;display:flex;flex-direction:column}.wrap{flex:1 0 auto;width:100%}.appFooter{flex:0 0 auto;margin-top:auto!important}
+:root{--appHeaderH:86px!important}.appFixedHeader{height:calc(var(--appHeaderH) + env(safe-area-inset-top))!important;min-height:86px!important;display:grid!important;grid-template-columns:minmax(170px,270px) minmax(120px,1fr) auto!important;grid-template-rows:1fr!important;gap:12px!important;padding-bottom:0!important}
+.appBrandTextLogo{grid-column:1!important;grid-row:1!important;line-height:.9!important;transform:none!important}.appBrandTextLogo span{background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important;color:#171717!important;-webkit-text-stroke:0!important;text-shadow:none!important;letter-spacing:-.02em!important;font-weight:900!important}.brandMinecraft{font-size:24px!important}.brandAnalyzer{font-size:22px!important;margin-top:4px!important}.appSearchWrap{grid-column:2!important;grid-row:1!important;height:46px!important;width:100%!important}.menuWrap{grid-column:3!important;grid-row:1!important}.appSearchResults{top:53px!important}
+.nextTop{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:2}.nextFilterBtn{min-height:34px!important;padding:5px 10px!important;border:2px solid #171717!important;border-radius:11px!important;background:#1689F4!important;color:#fff!important;box-shadow:0 3px 0 #171717!important;font-size:8px!important}.nextFilters{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 2px}.nextFilters[hidden]{display:none!important}.nextFilters select{min-width:0;height:40px;border:2px solid #171717;border-radius:11px;background:#fff;padding:0 8px;font:inherit;font-size:9px}
+.settingsSheet{z-index:15000!important;align-items:center!important;overflow:auto!important}.settingsFull{max-height:min(82dvh,720px);overflow:auto!important}.settingsTop{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.settingsTop h2{margin:0!important}.settingsTop button{width:auto!important;min-height:40px!important;padding:6px 12px!important}.settingSection{border:3px solid #171717;border-radius:18px;padding:14px;margin:0 0 14px;background:#F7FBFF;box-shadow:0 4px 0 rgba(23,23,23,.18)}.settingSection:nth-of-type(2){background:#FFF2C9}.settingSection h3{margin:0 0 10px;font-size:14px}.settingSection label{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,42%);align-items:center;gap:10px;margin:8px 0;font-size:9px}.settingSection input,.settingSection select{height:40px;border:2px solid #171717;border-radius:10px;background:#fff;padding:0 8px;font:inherit;font-size:9px}
+.fineTuneRow{align-items:start!important}#nudgePanel.nudgePanelCompact,.previewMini{align-self:start!important;margin-top:0!important}
+@media(max-width:720px){:root{--appHeaderH:82px!important}.appFixedHeader{min-height:82px!important;grid-template-columns:minmax(112px,150px) minmax(0,1fr) 46px!important;grid-template-rows:1fr!important;gap:7px!important;padding-left:max(10px,env(safe-area-inset-left))!important;padding-right:max(10px,env(safe-area-inset-right))!important}.appBrandTextLogo{grid-column:1!important;grid-row:1!important}.appSearchWrap{grid-column:2!important;grid-row:1!important;height:42px!important}.menuWrap{grid-column:3!important;grid-row:1!important}.brandMinecraft{font-size:16px!important}.brandAnalyzer{font-size:14px!important;margin-top:3px!important}.searchIcon{width:30px!important;font-size:17px!important}.appSearch{font-size:9px!important}.menuButton{width:42px!important;height:42px!important;min-height:42px!important}.appSearchResults{left:auto!important;right:-52px!important;width:min(330px,calc(100vw - 20px))!important;top:49px!important}.nextFilters{grid-template-columns:1fr}.settingSection label{grid-template-columns:1fr}.fineTuneRow{align-items:start!important}#nudgePanel.nudgePanelCompact,.previewMini{height:128px!important;min-height:128px!important;max-height:128px!important}}
+
+
+/* v182 — definitive fine-tune alignment/color fix */
+.fineTuneRow{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:10px!important;
+  align-items:stretch!important;
+}
+#nudgePanel.nudgePanelCompact,
+.previewMini{
+  position:relative!important;
+  width:100%!important;
+  height:132px!important;
+  min-height:132px!important;
+  max-height:132px!important;
+  margin:0!important;
+  padding:8px!important;
+  align-self:stretch!important;
+  justify-self:stretch!important;
+  box-sizing:border-box!important;
+  border:3px solid #171717!important;
+  border-radius:15px!important;
+  transform:none!important;
+  top:auto!important;
+  bottom:auto!important;
+}
+#nudgePanel.nudgePanelCompact,
+#nudgePanel.nudgePanelCompact.inactive{
+  background:#1689F4!important;
+  opacity:1!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+}
+#nudgePanel .small{color:#fff!important;opacity:1!important}
+#nudgePanel .nudgePad button,
+#nudgePanel .nudgePad button:disabled{
+  background:#FFE928!important;
+  color:#171717!important;
+  opacity:1!important;
+  -webkit-text-fill-color:#171717!important;
+}
+.previewMini{
+  background:#171717!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.previewMini #editPreview{
+  width:min(108px,calc(100% - 4px))!important;
+  height:min(108px,calc(100% - 18px))!important;
+  aspect-ratio:1/1!important;
+  object-fit:contain!important;
+  margin:0!important;
+}
+@media(min-width:721px){
+ #nudgePanel.nudgePanelCompact,.previewMini{height:152px!important;min-height:152px!important;max-height:152px!important}
+ .previewMini #editPreview{width:min(128px,calc(100% - 4px))!important;height:min(128px,calc(100% - 18px))!important}
+}
+
+/* v183 — fine tune panel hard reset */
+.fineTuneRow{display:flex!important;flex-direction:row!important;align-items:stretch!important;gap:10px!important;width:100%!important}
+.fineTuneRow>#nudgePanel.nudgePanelCompact,.fineTuneRow>.previewMini{flex:1 1 0!important;width:0!important;height:132px!important;min-height:132px!important;max-height:132px!important;margin:0!important;align-self:stretch!important;box-sizing:border-box!important;position:relative!important;top:0!important;transform:none!important}
+.fineTuneRow>#nudgePanel.nudgePanelCompact,.fineTuneRow>#nudgePanel.nudgePanelCompact.inactive{background:#1689F4!important;background-color:#1689F4!important;opacity:1!important;border:3px solid #171717!important;padding:8px!important}
+.fineTuneRow>#nudgePanel .small{color:#fff!important;opacity:1!important}
+.fineTuneRow>#nudgePanel .nudgePad button,.fineTuneRow>#nudgePanel .nudgePad button:disabled{background:#FFE928!important;background-color:#FFE928!important;color:#171717!important;-webkit-text-fill-color:#171717!important;opacity:1!important;filter:none!important}
+.fineTuneRow>.previewMini{background:#171717!important;border:3px solid #171717!important;padding:8px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important}
+.fineTuneRow>.previewMini #editPreview{width:min(108px,calc(100% - 2px))!important;height:min(108px,calc(100% - 18px))!important;margin:0!important}
+@media(min-width:721px){.fineTuneRow>#nudgePanel.nudgePanelCompact,.fineTuneRow>.previewMini{height:152px!important;min-height:152px!important;max-height:152px!important}.fineTuneRow>.previewMini #editPreview{width:min(128px,calc(100% - 2px))!important;height:min(128px,calc(100% - 18px))!important}}
+
+/* v183 — hard reset fine-tune layout */
+#editModal .fineTuneRow{display:flex!important;flex-direction:row!important;align-items:stretch!important;justify-content:stretch!important;gap:10px!important;width:100%!important;margin:10px 0 0!important;padding:0!important;}
+#editModal #nudgePanel.nudgePanelCompact,#editModal .previewMini{flex:1 1 0!important;width:0!important;height:136px!important;min-height:136px!important;max-height:136px!important;margin:0!important;box-sizing:border-box!important;align-self:stretch!important;position:relative!important;top:0!important;transform:none!important;border:3px solid #171717!important;border-radius:15px!important;}
+#editModal #nudgePanel.nudgePanelCompact,#editModal #nudgePanel.nudgePanelCompact.inactive{background:#1689F4!important;opacity:1!important;padding:8px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;}
+#editModal #nudgePanel .small{color:#fff!important;width:100%!important;text-align:left!important;margin:0 0 5px!important;}
+#editModal #nudgePanel .nudgePad{display:grid!important;grid-template-columns:40px 40px 40px!important;grid-template-rows:34px 34px 34px!important;grid-template-areas:'. up .' 'left . right' '. down .'!important;gap:4px!important;justify-content:center!important;align-content:center!important;margin:0!important;}
+#editModal #nudgePanel .nudgePad button,#editModal #nudgePanel .nudgePad button:disabled{width:40px!important;height:34px!important;min-height:34px!important;padding:0!important;background:#FFE928!important;color:#171717!important;-webkit-text-fill-color:#171717!important;opacity:1!important;border:2px solid #171717!important;border-radius:9px!important;box-shadow:0 2px 0 #171717!important;font-size:18px!important;font-weight:900!important;}
+#editModal .previewMini{background:#171717!important;padding:6px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;}
+#editModal .previewMini span{height:12px!important;line-height:12px!important;margin:0 0 3px!important;color:#fff!important;font-size:7px!important;}
+#editModal .previewMini #editPreview{display:block!important;width:min(112px,calc(100% - 4px))!important;height:min(112px,calc(100% - 19px))!important;max-width:none!important;max-height:none!important;aspect-ratio:1/1!important;margin:0!important;padding:0!important;border:0!important;border-radius:6px!important;image-rendering:pixelated!important;object-fit:contain!important;}
+
+
+
+/* v188: DB / dictionary manager stays below the fixed header */
+#dbManagerModal,#dictManagerModal{
+  z-index:8500!important;
+  top:calc(var(--appHeaderH) + env(safe-area-inset-top))!important;
+  bottom:0!important;
+  height:auto!important;
+  align-items:stretch!important;
+  justify-content:center!important;
+  padding:12px 12px max(12px,env(safe-area-inset-bottom))!important;
+  overflow:hidden!important;
+  overscroll-behavior:contain!important;
+}
+#dbManagerModal .modalBox,#dictManagerModal .modalBox{
+  width:min(760px,100%)!important;
+  max-height:none!important;
+  height:100%!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior:contain!important;
+  padding:18px!important;
+}
+#dbManagerModal .managerHead,#dictManagerModal .managerHead{
+  position:sticky!important;
+  top:-18px!important;
+  z-index:20!important;
+  margin:-18px -18px 14px!important;
+  padding:12px 16px!important;
+  background:linear-gradient(180deg,#FFCC21,#FFAA00)!important;
+  border-bottom:4px solid #171717!important;
+}
+.dbDanger{background:#fff0f0!important;border-color:#9d3333!important;color:#8b2020!important}
+.dictForm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;padding:12px;border:2px solid #171717;border-radius:14px;background:#EAF6FF}
+.dictForm .wide{grid-column:1/-1}
+.dictEntry{padding:11px;border:1px solid #DCE4EC;border-radius:12px;background:#fff}
+.dictEntry .meta{font-size:10px;color:#5d6670;word-break:break-all;margin:4px 0 8px}
+.dictBadge{display:inline-flex;padding:3px 7px;border-radius:999px;font-size:9px;background:#E7F3FC;color:#005B9A;border:1px solid #BEDDF2}
+@media(max-width:600px){
+ #dbManagerModal,#dictManagerModal{padding:8px 8px max(8px,env(safe-area-inset-bottom))!important}
+ #dbManagerModal .modalBox,#dictManagerModal .modalBox{padding:14px!important;border-radius:20px!important}
+ #dbManagerModal .managerHead,#dictManagerModal .managerHead{top:-14px!important;margin:-14px -14px 12px!important;padding:10px 12px!important}
+ .dictForm{grid-template-columns:1fr}
+ .dictForm .wide{grid-column:1}
+}
+
+
+/* v197: result autocomplete is a body-level portal, positioned from the
+   name input's document coordinates. Inline anchor coordinates must win. */
+.suggest.resultSuggestPortal{
+  position:absolute!important;
+  right:auto!important;
+  bottom:auto!important;
+  z-index:20050!important;
+  box-sizing:border-box!important;
+  max-width:calc(100vw - 16px)!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior:contain!important;
+  touch-action:pan-y!important;
+  contain:layout paint;
+}
+.suggest.resultSuggestPortal button{
+  box-sizing:border-box!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  touch-action:manipulation!important;
+}
+.suggest.resultSuggestPortal .small{overflow-wrap:anywhere!important;word-break:break-all!important}
+
+/* v193: after every current analysis result is DB-registered, offer to return home */
+/* v192: confirmation dialog shared by DB and dictionary manager modals */
+#confirmModal{z-index:12000!important;inset:0!important;top:0!important;bottom:0!important;align-items:center!important;justify-content:center!important;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))!important;}
+#confirmModal .modalBox{width:min(420px,100%)!important;height:auto!important;max-height:calc(100dvh - 32px)!important;overflow:auto!important;position:relative!important;z-index:12001!important;}
+
+
+/* v198 DB manager isolation / filters / bulk selection */
+#dbManagerList .dbManagerCard{background:#fff!important;color:#171717!important;border:1px solid #C9D9E6!important;border-top:5px solid var(--logo-blue)!important;border-radius:16px!important;padding:12px!important;margin:0!important;min-height:0!important;aspect-ratio:auto!important;display:block!important;overflow:visible!important;box-shadow:0 7px 18px rgba(0,103,184,.09)!important}
+#dbManagerList .dbManagerCard .small{position:static!important;color:var(--muted)!important;text-shadow:none!important;font-size:11px!important}
+.dbManagerFilters,.dbManagerBulk{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.dbManagerFilters select{flex:1 1 150px;min-width:0}.dbManagerBulk label{display:flex;align-items:center;gap:6px}.dbManagerBulk input[type=checkbox],.dbmSelect{width:22px;height:22px;accent-color:#1689F4}.dbManagerBulk #dbManagerSelectedCount{font-size:12px;color:#52606b}.dbmTop{display:grid;grid-template-columns:28px 72px minmax(0,1fr);gap:10px;align-items:start}.dbmSelectWrap{padding-top:22px;display:flex;justify-content:center}
+@media(max-width:600px){.dbManagerBulk button{flex:1 1 130px}.dbmTop{grid-template-columns:26px 72px minmax(0,1fr)}}
+
+#dbBackupBtn{display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.15;}
+
+/* v203 — three-line block / 3D header wordmark inspired by the supplied reference */
+.appBrandTextLogo.heroBrand{display:flex!important;align-items:center!important;justify-content:flex-start!important;min-width:0!important;width:100%!important;line-height:1!important;overflow:visible!important}
+.heroBrandSvg{display:block!important;width:min(100%,238px)!important;height:auto!important;max-height:66px!important;overflow:visible!important}
+.heroLogoText{font-family:Impact,"Arial Black",Helvetica,sans-serif!important;font-weight:900!important;letter-spacing:-.8px!important;paint-order:stroke fill!important;stroke-linejoin:miter!important}
+.heroLogoExtrude{fill:#8A2608!important;stroke:#171717!important;stroke-width:2.4px!important}
+.heroLogoMid{fill:#D84A0A!important;stroke:#171717!important;stroke-width:2.4px!important}
+.heroLogoFront{fill:url(#heroGold)!important;stroke:#171717!important;stroke-width:2.2px!important}
+.heroLogoHighlight{fill:none!important;stroke:rgba(255,255,255,.72)!important;stroke-width:.55px!important;stroke-linejoin:miter!important}
+@media(max-width:720px){
+ .appFixedHeader{grid-template-columns:minmax(154px,190px) minmax(0,1fr) 46px!important}
+ .heroBrandSvg{width:min(100%,190px)!important;max-height:60px!important}
+}
+@media(max-width:430px){
+ .appFixedHeader{grid-template-columns:minmax(148px,176px) minmax(0,1fr) 46px!important}
+ .heroBrandSvg{width:min(100%,176px)!important;max-height:56px!important}
+}
+
+/* v204 — true pixel-block 3D wordmark; taller two-row header */
+:root{--appHeaderH:176px!important}
+.appFixedHeader{height:calc(var(--appHeaderH) + env(safe-area-inset-top))!important;min-height:176px!important;display:grid!important;grid-template-columns:minmax(0,1fr) 54px!important;grid-template-rows:112px 50px!important;gap:6px 10px!important;padding:8px max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left))!important;align-items:center!important}
+.appBrandTextLogo.heroBrand{grid-column:1/3!important;grid-row:1!important;justify-content:center!important;height:112px!important;overflow:visible!important}
+.pixelHeroBrandSvg{display:block!important;width:min(100%,330px)!important;height:108px!important;overflow:visible!important}
+.appSearchWrap{grid-column:1!important;grid-row:2!important;height:48px!important;width:100%!important}
+.menuWrap{grid-column:2!important;grid-row:2!important}.menuButton{width:50px!important;height:48px!important;min-height:48px!important}.appSearchResults{top:55px!important}
+@media(max-width:430px){:root{--appHeaderH:170px!important}.appFixedHeader{min-height:170px!important;grid-template-columns:minmax(0,1fr) 48px!important;grid-template-rows:108px 48px!important;padding-left:max(10px,env(safe-area-inset-left))!important;padding-right:max(10px,env(safe-area-inset-right))!important}.appBrandTextLogo.heroBrand{height:108px!important}.pixelHeroBrandSvg{width:min(100%,310px)!important;height:104px!important}.appSearchWrap{height:46px!important}.menuButton{width:46px!important;height:46px!important;min-height:46px!important}}
+
+/* v205 — reference-matched chunky 3D wordmark + restored camera-bar clearance */
+:root{--appHeaderH:270px!important;--cameraClearance:18px}
+.appFixedHeader{
+ height:calc(var(--appHeaderH) + env(safe-area-inset-top))!important;
+ min-height:270px!important;
+ grid-template-columns:minmax(0,1fr) 58px!important;
+ grid-template-rows:190px 58px!important;
+ gap:8px 12px!important;
+ padding-top:calc(env(safe-area-inset-top) + var(--cameraClearance))!important;
+ padding-bottom:10px!important;
+ box-sizing:border-box!important;
+}
+.appBrandTextLogo.heroBrand{grid-column:1/3!important;grid-row:1!important;height:190px!important;align-self:end!important;justify-content:center!important;overflow:visible!important}
+.hero205{display:block!important;width:min(100%,520px)!important;height:184px!important;overflow:visible!important}
+.appSearchWrap{grid-column:1!important;grid-row:2!important;height:54px!important}
+.menuWrap{grid-column:2!important;grid-row:2!important}.menuButton{width:54px!important;height:54px!important;min-height:54px!important}.appSearchResults{top:61px!important}
+body{padding-top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 18px)!important}
+#editModal,#dbManagerModal,#dictManagerModal{top:calc(var(--appHeaderH) + env(safe-area-inset-top))!important}
+#loupeWrap{top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 12px)!important}
+@media(max-width:430px){
+ :root{--appHeaderH:258px!important;--cameraClearance:20px}
+ .appFixedHeader{min-height:258px!important;grid-template-columns:minmax(0,1fr) 50px!important;grid-template-rows:178px 52px!important;gap:8px!important;padding-left:max(10px,env(safe-area-inset-left))!important;padding-right:max(10px,env(safe-area-inset-right))!important}
+ .appBrandTextLogo.heroBrand{height:178px!important}.hero205{width:min(100%,390px)!important;height:174px!important}
+ .appSearchWrap{height:50px!important}.menuButton{width:50px!important;height:50px!important;min-height:50px!important}
+}
+
+
+/* v206 — logo is drawn as literal pixel art on an internal grid; no font glyphs */
+:root{--appHeaderH:282px!important;--cameraClearance:22px!important}
+.appFixedHeader{grid-template-rows:198px 58px!important;min-height:282px!important}
+.appBrandTextLogo.heroBrand{height:198px!important;align-items:center!important;justify-content:center!important}
+.pixelLogoCanvas{display:block!important;width:min(100%,560px)!important;height:190px!important;image-rendering:pixelated!important;image-rendering:crisp-edges!important}
+@media(max-width:430px){:root{--appHeaderH:270px!important}.appFixedHeader{grid-template-rows:188px 52px!important;min-height:270px!important}.appBrandTextLogo.heroBrand{height:188px!important}.pixelLogoCanvas{width:min(100%,400px)!important;height:180px!important}}
+
+
+/* v209 — finer micro-pixel grid logo based on v207; smaller dots allow stepped glyph shaping */
+:root{--appHeaderH:286px!important;--cameraClearance:22px!important}
+.appFixedHeader{grid-template-rows:202px 58px!important;min-height:286px!important}
+.appBrandTextLogo.heroBrand{height:202px!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important}
+.pixelLogoCanvas{width:min(100%,680px)!important;height:198px!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+@media(max-width:430px){:root{--appHeaderH:276px!important}.appFixedHeader{grid-template-rows:194px 52px!important;min-height:276px!important}.appBrandTextLogo.heroBrand{height:194px!important}.pixelLogoCanvas{width:100%!important;height:190px!important}}
+
+/* v213 — unified 105-dot voxel-stair glyph system */
+:root{--appHeaderH:304px!important}
+.appFixedHeader{grid-template-rows:220px 58px!important;min-height:304px!important}
+.appBrandTextLogo.heroBrand{height:220px!important}
+.pixelLogoCanvas{width:100%!important;height:216px!important}
+@media(max-width:430px){:root{--appHeaderH:294px!important}.appFixedHeader{grid-template-rows:210px 52px!important;min-height:294px!important}.appBrandTextLogo.heroBrand{height:210px!important}.pixelLogoCanvas{height:206px!important}}
+
+</style>
+
+<style id="v216-direct-header-logo">
+/* v216: use the supplied high-resolution transparent logo directly. */
+.appBrandTextLogo.heroBrand{display:flex!important;align-items:center!important;justify-content:center!important;overflow:visible!important;padding:0 10px!important}
+.headerDirectLogo{display:block!important;width:min(100%,700px)!important;height:auto!important;max-height:100%!important;object-fit:contain!important;image-rendering:auto!important}
+@media(max-width:430px){
+  :root{--appHeaderH:286px!important}
+  .appFixedHeader{grid-template-rows:202px 52px!important;min-height:286px!important}
+  .appBrandTextLogo.heroBrand{height:202px!important;padding:0 8px!important}
+  .headerDirectLogo{width:100%!important;height:100%!important;object-fit:contain!important}
+}
+</style>
+
+<style id="v217-compact-left-logo-header">
+/* v217: compact single-row header — supplied logo at about 1/4 of prior display size. */
+:root{--appHeaderH:112px!important;--cameraClearance:22px!important}
+.appFixedHeader{
+  height:calc(var(--appHeaderH) + env(safe-area-inset-top))!important;
+  min-height:112px!important;
+  display:grid!important;
+  grid-template-columns:128px minmax(0,1fr) 52px!important;
+  grid-template-rows:58px!important;
+  gap:10px!important;
+  align-content:end!important;
+  align-items:center!important;
+  padding-top:calc(env(safe-area-inset-top) + var(--cameraClearance))!important;
+  padding-bottom:10px!important;
+  padding-left:max(12px,env(safe-area-inset-left))!important;
+  padding-right:max(12px,env(safe-area-inset-right))!important;
+}
+.appBrandTextLogo.heroBrand{
+  grid-column:1!important;grid-row:1!important;
+  width:128px!important;height:58px!important;
+  padding:0!important;
+  justify-content:flex-start!important;align-items:center!important;
+  overflow:visible!important;
+}
+.headerDirectLogo{
+  width:120px!important;height:auto!important;max-height:56px!important;
+  object-fit:contain!important;object-position:left center!important;
+}
+.appSearchWrap{grid-column:2!important;grid-row:1!important;height:50px!important;width:100%!important}
+.menuWrap{grid-column:3!important;grid-row:1!important}.menuButton{width:50px!important;height:50px!important;min-height:50px!important}
+.appSearchResults{top:57px!important}
+body{padding-top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 18px)!important}
+#editModal,#dbManagerModal,#dictManagerModal{top:calc(var(--appHeaderH) + env(safe-area-inset-top))!important}
+#loupeWrap{top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 12px)!important}
+@media(max-width:430px){
+  :root{--appHeaderH:106px!important;--cameraClearance:20px!important}
+  .appFixedHeader{
+    min-height:106px!important;
+    grid-template-columns:112px minmax(0,1fr) 48px!important;
+    grid-template-rows:54px!important;
+    gap:7px!important;
+    padding-left:max(10px,env(safe-area-inset-left))!important;
+    padding-right:max(10px,env(safe-area-inset-right))!important;
+    padding-bottom:8px!important;
+  }
+  .appBrandTextLogo.heroBrand{width:112px!important;height:54px!important}
+  .headerDirectLogo{width:106px!important;max-height:50px!important}
+  .appSearchWrap{height:46px!important}
+  .menuButton{width:46px!important;height:46px!important;min-height:46px!important}
+  .appSearchResults{top:53px!important;right:-53px!important;width:min(330px,calc(100vw - 20px))!important}
+}
+</style>
+
+<style id="v220-camera-4mm-up">
+/* v220: move the compact iPhone header controls ~4 mm (15 CSS px) upward toward the camera bar. */
+@media(max-width:430px){
+  :root{--appHeaderH:59px!important;--cameraClearance:0px!important}
+  .appFixedHeader{
+    min-height:59px!important;
+    padding-top:env(safe-area-inset-top)!important;
+    padding-bottom:0!important;
+  }
+  .appFixedHeader > .appBrandTextLogo,
+  .appFixedHeader > .appSearchWrap,
+  .appFixedHeader > .menuWrap{
+    transform:translateY(-15px)!important;
+  }
+  body{padding-top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 10px)!important}
+  #editModal,#dbManagerModal,#dictManagerModal{top:calc(var(--appHeaderH) + env(safe-area-inset-top))!important}
+  #loupeWrap{top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 8px)!important}
+}
+</style>
+<style id="v222-white-home-icons">
+.suppliedPanelIcon{overflow:hidden!important;background:#fff!important;border:0!important}
+.suppliedPanelIcon img{width:100%;height:100%;object-fit:contain;display:block;image-rendering:pixelated}
+</style>
+
+<style id="v224-footer-mba-brand">
+/* v224: MBA brand is centered against the full footer width, independent of side content. */
+.footerCard{position:relative!important;grid-template-columns:minmax(0,1fr) 92px!important}
+.footerBrand{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;z-index:3!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;padding:0!important;pointer-events:none!important}
+.footerBrand img{display:block!important;width:56px!important;height:56px!important;object-fit:contain!important}
+.footerBrand span{font-size:8px!important;font-weight:900!important;letter-spacing:.14em!important;line-height:1!important;color:#fff!important;text-shadow:0 2px 0 rgba(23,23,23,.35)!important}
+@media(max-width:600px){
+  .footerCard{grid-template-columns:minmax(0,1fr) 78px!important}
+  .footerBrand img{width:46px!important;height:46px!important}
+  .footerBrand span{font-size:7px!important}
+}
+</style>
+
+<style id="v225-footer-landscape">
+/* v227: transparent landscape, flush against footer */
+.footerLandscape{display:block;width:100%;margin:0!important;padding:0!important;line-height:0!important;overflow:hidden;background:transparent!important}
+.footerLandscape img{display:block!important;width:100%!important;height:auto!important;margin:0!important;padding:0!important;vertical-align:bottom!important}
+.footerLandscape + .appFooter{margin-top:0!important}
+.appFooter{margin-top:0!important}
+</style>
+
+<style id="v229-footer-cards-spacing">
+/* v229: blue footer controls with white labels; keep landscape close to DB card. */
+.wrap{flex:0 0 auto!important}
+#uploadView{padding-bottom:2px!important}
+#uploadView .dbPanel{margin-bottom:2px!important}
+.footerMore,.updateTag,.footerBack{background:#1689F4!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+.footerMore,.updateTag,.footerBack,.footerBack span{color:#fff!important}
+</style>
+
+<style id="v230-footer-link-style">
+.footerMore,.updateTag,.footerBack{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+.footerMore{padding:3px 2px!important;text-decoration:underline;text-underline-offset:3px!important}
+.updateTag{padding:2px 0!important;min-width:0!important;text-align:left!important}
+.footerBack{width:64px!important;height:56px!important;min-height:56px!important;padding:0!important}
+.footerBack span{color:#fff!important}
+</style>
+
+<style id="v231-slim-translucent-footer">
+/* v231: slimmer footer; all footer text intentionally translucent. */
+.footerLeft{padding-top:7px!important;padding-bottom:7px!important}
+.footerHead{padding-bottom:3px!important}
+.updateList{gap:1px!important}
+.updateRow{padding:0!important}
+.footerBottom{padding-top:5px!important;padding-bottom:5px!important}
+.footerBack{height:44px!important;min-height:44px!important}
+.footerCard,.footerCard *{color:rgba(255,255,255,.62)!important;-webkit-text-fill-color:rgba(255,255,255,.62)!important}
+.footerBrand img{opacity:.62!important}
+.footerBrand span{color:rgba(255,255,255,.62)!important;-webkit-text-fill-color:rgba(255,255,255,.62)!important;text-shadow:none!important}
+.footerMore,.updateTag,.footerBack,.footerBack span,.updateText b,.footerHead strong{color:rgba(255,255,255,.62)!important;-webkit-text-fill-color:rgba(255,255,255,.62)!important}
+@media(max-width:600px){
+ .footerLeft{padding-top:6px!important;padding-bottom:6px!important}
+ .footerBack{height:40px!important;min-height:40px!important}
+ .footerBrand img{width:40px!important;height:40px!important}
+}
+</style>
+
+<style id="v232-footer-refine">
+/* v232: tighter footer. History label/content translucent; MBA stays at v231 opacity. */
+.footerLeft{padding-top:3px!important;padding-bottom:3px!important}
+.footerHead{padding-bottom:1px!important}
+.updateList{gap:0!important}
+.updateRow{padding:0!important;line-height:1.05!important}
+.footerBottom{padding-top:2px!important;padding-bottom:2px!important}
+.footerBack{height:34px!important;min-height:34px!important}
+.footerHead strong,.footerMore,.updateTag,.updateText b,.updateText small{
+ color:rgba(255,255,255,.48)!important;
+ -webkit-text-fill-color:rgba(255,255,255,.48)!important;
+}
+/* Do not make MBA any more transparent than v231. */
+.footerBrand img{opacity:.62!important}
+.footerBrand span{color:rgba(255,255,255,.62)!important;-webkit-text-fill-color:rgba(255,255,255,.62)!important}
+@media(max-width:600px){
+ .footerLeft{padding-top:2px!important;padding-bottom:2px!important}
+ .footerBack{height:32px!important;min-height:32px!important}
+}
+</style>
+
+<style id="v233-reference-footer-layout">
+/* v233: footer rebuilt to match the supplied reference composition. */
+.appFooter{
+  margin:0!important;
+  padding:0!important;
+}
+.footerCard.footerReference{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1.65fr) minmax(76px,.75fr) minmax(106px,.9fr)!important;
+  align-items:center!important;
+  min-height:132px!important;
+  padding:34px 18px 12px!important;
+  gap:14px!important;
+  overflow:visible!important;
+  background:linear-gradient(180deg,#1689F4,#0067B8)!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  color:rgba(255,255,255,.58)!important;
+}
+.footerHistoryBlock{
+  min-width:0!important;
+  align-self:center!important;
+}
+.footerReference .footerHead{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  padding:0 0 7px!important;
+  margin:0!important;
+  background:transparent!important;
+  border:0!important;
+  color:rgba(255,255,255,.58)!important;
+}
+.footerReference .footerHead strong{
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  font-size:15px!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  color:rgba(255,255,255,.58)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.58)!important;
+}
+.footerPickaxe{
+  font-size:18px!important;
+  line-height:1!important;
+  filter:saturate(.9)!important;
+}
+.footerDivider{
+  opacity:.55!important;
+}
+.footerReference .footerMore{
+  min-height:0!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  text-decoration:underline!important;
+  text-underline-offset:3px!important;
+  font-size:11px!important;
+  color:rgba(255,255,255,.58)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.58)!important;
+}
+.footerReference .updateList{
+  display:grid!important;
+  gap:5px!important;
+}
+.footerReference .updateRow{
+  display:grid!important;
+  grid-template-columns:58px minmax(0,1fr)!important;
+  gap:8px!important;
+  align-items:center!important;
+  padding:0!important;
+  min-width:0!important;
+}
+.footerReference .updateTag{
+  display:block!important;
+  min-width:0!important;
+  padding:4px 6px!important;
+  background:rgba(255,255,255,.14)!important;
+  border:0!important;
+  border-radius:5px!important;
+  box-shadow:none!important;
+  text-align:center!important;
+  font-size:8px!important;
+  letter-spacing:.02em!important;
+  color:rgba(255,255,255,.58)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.58)!important;
+}
+.footerReference .updateText{
+  min-width:0!important;
+}
+.footerReference .updateText b{
+  display:block!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  font-size:9px!important;
+  font-weight:700!important;
+  color:rgba(255,255,255,.58)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.58)!important;
+}
+.footerReference .updateText small{display:none!important}
+
+.footerReference .footerBrand{
+  position:static!important;
+  transform:none!important;
+  z-index:auto!important;
+  align-self:center!important;
+  justify-self:center!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:2px!important;
+  padding:0!important;
+  pointer-events:none!important;
+}
+.footerReference .footerBrand img{
+  display:block!important;
+  width:68px!important;
+  height:68px!important;
+  object-fit:contain!important;
+  opacity:.62!important;
+}
+.footerReference .footerBrand span{
+  font-size:9px!important;
+  font-weight:900!important;
+  letter-spacing:.22em!important;
+  color:rgba(255,255,255,.62)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.62)!important;
+  text-shadow:none!important;
+}
+
+.footerBackTop{
+  position:absolute!important;
+  top:8px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  width:auto!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:1px 4px 3px!important;
+  background:transparent!important;
+  border:0!important;
+  border-bottom:2px solid rgba(255,255,255,.66)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  font-size:18px!important;
+  line-height:1!important;
+  color:rgba(255,255,255,.72)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.72)!important;
+}
+.footerBackTop span{
+  display:inline!important;
+  margin:0!important;
+  font-size:11px!important;
+  line-height:1!important;
+  color:rgba(255,255,255,.72)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.72)!important;
+}
+
+.footerLinks{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  gap:12px!important;
+  min-width:0!important;
+}
+.footerPlainLink{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  padding:0 0 3px!important;
+  background:transparent!important;
+  border:0!important;
+  border-bottom:2px solid rgba(255,255,255,.48)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  font:inherit!important;
+  font-size:12px!important;
+  color:rgba(255,255,255,.58)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.58)!important;
+}
+.footerLinkIcon{
+  width:24px!important;
+  text-align:center!important;
+  font-size:22px!important;
+  line-height:1!important;
+  color:rgba(255,255,255,.62)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.62)!important;
+}
+
+@media(max-width:600px){
+  .footerCard.footerReference{
+    grid-template-columns:minmax(0,1.55fr) 70px 92px!important;
+    min-height:118px!important;
+    padding:30px 10px 8px!important;
+    gap:8px!important;
+  }
+  .footerReference .footerHead{gap:5px!important;padding-bottom:5px!important}
+  .footerReference .footerHead strong{font-size:11px!important;gap:4px!important}
+  .footerPickaxe{font-size:14px!important}
+  .footerReference .footerMore{font-size:8px!important}
+  .footerReference .updateList{gap:3px!important}
+  .footerReference .updateRow{grid-template-columns:44px minmax(0,1fr)!important;gap:5px!important}
+  .footerReference .updateTag{font-size:6px!important;padding:3px 3px!important}
+  .footerReference .updateText b{font-size:7px!important}
+  .footerReference .footerBrand img{width:54px!important;height:54px!important}
+  .footerReference .footerBrand span{font-size:7px!important}
+  .footerBackTop{top:6px!important;font-size:14px!important}
+  .footerBackTop span{font-size:9px!important}
+  .footerLinks{gap:10px!important}
+  .footerPlainLink{gap:5px!important;font-size:9px!important;border-bottom-width:1px!important}
+  .footerLinkIcon{width:18px!important;font-size:17px!important}
+}
+</style>
+
+
+<style id="v234-centered-mba-footer">
+/* Keep the MBA mark geometrically centered in the whole footer, independent of side columns. */
+.footerCard.footerReference{position:relative!important}
+.footerReference .footerBrand{
+  position:absolute!important;
+  left:50%!important;
+  top:55%!important;
+  transform:translate(-50%,-50%)!important;
+  z-index:2!important;
+}
+
+/* Make the history block more compact so it does not visually push into the center. */
+.footerReference .footerHead strong{
+  font-size:11px!important;
+}
+.footerReference .footerMore{
+  font-size:8px!important;
+}
+.footerReference .updateRow{
+  grid-template-columns:36px minmax(0,1fr)!important;
+  gap:5px!important;
+}
+.footerReference .updateTag{
+  font-size:5.5px!important;
+  line-height:1!important;
+  padding:2px 2px!important;
+  border-radius:3px!important;
+}
+.footerReference .updateText b{
+  font-size:7px!important;
+}
+.footerHistoryBlock{
+  max-width:44%!important;
+}
+
+/* Brand keeps the current opacity, only centering changes. */
+.footerReference .footerBrand img{
+  width:62px!important;
+  height:62px!important;
+}
+.footerReference .footerBrand span{
+  font-size:7px!important;
+}
+
+@media(max-width:600px){
+  .footerReference .footerHead strong{font-size:9px!important}
+  .footerReference .footerMore{font-size:6.5px!important}
+  .footerReference .updateRow{grid-template-columns:31px minmax(0,1fr)!important;gap:4px!important}
+  .footerReference .updateTag{font-size:4.7px!important;padding:2px 1px!important}
+  .footerReference .updateText b{font-size:6px!important}
+  .footerReference .footerBrand img{width:56px!important;height:56px!important}
+  .footerReference .footerBrand span{font-size:6.5px!important}
+}
+</style>
+
+
+<style id="v235-footer-right-links-fixed">
+/* Fix right-side footer links independently from the centered MBA mark. */
+.footerCard.footerReference{
+  position:relative!important;
+}
+.footerReference .footerLinks{
+  position:absolute!important;
+  right:18px!important;
+  top:50%!important;
+  transform:translateY(-42%)!important;
+  width:92px!important;
+  margin:0!important;
+  z-index:2!important;
+  align-items:flex-start!important;
+}
+@media(max-width:600px){
+  .footerReference .footerLinks{
+    right:10px!important;
+    width:78px!important;
+  }
+}
+</style>
+
+
+<style id="v236-footer-link-icons">
+/* v236: underline the text itself instead of drawing a separate line under each link. */
+.footerPlainLink{
+  border-bottom:0!important;
+  padding-bottom:0!important;
+}
+.footerPlainLink > span{
+  text-decoration:underline!important;
+  text-underline-offset:3px!important;
+  text-decoration-thickness:1px!important;
+}
+.footerTitleIcon{
+  width:18px!important;
+  height:18px!important;
+  object-fit:contain!important;
+  flex:0 0 auto!important;
+  opacity:.62!important;
+  image-rendering:pixelated!important;
+}
+.footerLinkImg{
+  width:24px!important;
+  height:24px!important;
+  object-fit:contain!important;
+  flex:0 0 auto!important;
+  opacity:.62!important;
+  image-rendering:pixelated!important;
+}
+@media(max-width:600px){
+  .footerTitleIcon{width:14px!important;height:14px!important}
+  .footerLinkImg{width:19px!important;height:19px!important}
+}
+</style>
+
+
+<style id="v237-footer-unified-type">
+/* Unified footer typography and tighter vertical footprint. */
+.footerCard.footerReference{
+  min-height:96px!important;
+  padding:24px 10px 6px!important;
+}
+.footerReference .footerHead{padding-bottom:3px!important;gap:4px!important}
+.footerReference .footerHead strong,
+.footerReference .footerMore,
+.footerReference .updateTag,
+.footerReference .updateText b,
+.footerReference .footerBrand span,
+.footerBackTop span,
+.footerPlainLink{
+  font-size:8px!important;
+  line-height:1.2!important;
+  font-weight:700!important;
+}
+.footerReference .updateList{gap:2px!important}
+.footerReference .updateRow{grid-template-columns:31px minmax(0,1fr)!important;gap:4px!important}
+.footerReference .updateTag{padding:2px 1px!important}
+.footerReference .footerBrand img{width:48px!important;height:48px!important}
+.footerReference .footerBrand{top:55%!important;gap:1px!important}
+.footerBackTop{top:4px!important;padding:0 2px 2px!important;border-bottom:0!important}
+.footerBackTop span,
+.footerReference .footerMore,
+.footerPlainLink > span{
+  text-decoration:underline!important;
+  text-decoration-thickness:1px!important;
+  text-underline-offset:2px!important;
+}
+.footerReference .footerMore{padding:0!important}
+.footerReference .footerLinks{gap:7px!important;transform:translateY(-38%)!important}
+.footerTitleIcon{width:13px!important;height:13px!important}
+.footerLinkImg{width:18px!important;height:18px!important}
+@media(max-width:600px){
+  .footerCard.footerReference{min-height:88px!important;padding:21px 8px 5px!important}
+  .footerReference .footerHead strong,
+  .footerReference .footerMore,
+  .footerReference .updateTag,
+  .footerReference .updateText b,
+  .footerReference .footerBrand span,
+  .footerBackTop span,
+  .footerPlainLink{font-size:7px!important}
+  .footerReference .footerBrand img{width:44px!important;height:44px!important}
+  .footerTitleIcon{width:12px!important;height:12px!important}
+  .footerLinkImg{width:16px!important;height:16px!important}
+  .footerReference .footerLinks{gap:6px!important}
+}
+</style>
+
+<style id="v238-footer-assets-opacity">
+.footerReference .footerHead strong,.footerReference .footerMore,.footerReference .updateTag,
+.footerReference .updateText b,.footerBackTop,.footerBackTop span,.footerPlainLink,
+.footerPlainLink>span,.footerDivider{color:rgba(255,255,255,.74)!important;-webkit-text-fill-color:rgba(255,255,255,.74)!important}
+.footerReference .updateTag{background:rgba(255,255,255,.20)!important}
+.footerTitleIcon,.footerLinkImg{opacity:.78!important}
+.footerReference .footerBrand img{opacity:.88!important;width:52px!important;height:52px!important}
+.footerReference .footerBrand{gap:0!important}
+@media(max-width:600px){.footerReference .footerBrand img{width:48px!important;height:48px!important}}
+</style>
+
+<style id="v239-larger-footer-mba">
+.footerReference .footerBrand img{width:64px!important;height:64px!important}
+@media(max-width:600px){.footerReference .footerBrand img{width:60px!important;height:60px!important}}
+</style>
+
+<style id="v240-larger-footer-mba-fixed-height">
+/* Enlarge only the centered MBA logo; footer dimensions remain unchanged. */
+.footerReference .footerBrand img{width:82px!important;height:82px!important;max-width:none!important}
+@media(max-width:600px){.footerReference .footerBrand img{width:76px!important;height:76px!important}}
+</style>
+
+<style id="v241-footer-right-icon-gap">
+.footerReference .footerPlainLink{gap:12px!important}
+@media(max-width:600px){.footerReference .footerPlainLink{gap:10px!important}}
+</style>
+<style id="v242-four-footer-links">
+.footerReference .footerLinks{gap:4px!important}
+.footerReference .footerPlainLink{gap:10px!important}
+.footerReference .footerLinkImg{width:16px!important;height:16px!important}
+@media(max-width:600px){
+ .footerReference .footerLinks{gap:3px!important}
+ .footerReference .footerPlainLink{gap:8px!important}
+ .footerReference .footerLinkImg{width:14px!important;height:14px!important}
+}
+</style>
+
+<style id="v243-footer-right-tight-left">
+/* Keep footer height unchanged; pack the four right links tightly and move the group left. */
+.footerReference .footerLinks{
+  right:30px!important;
+  top:50%!important;
+  transform:translateY(-42%)!important;
+  gap:3px!important;
+}
+.footerReference .footerPlainLink{
+  min-height:0!important;
+  margin:0!important;
+  padding:1px 0!important;
+  line-height:1.05!important;
+}
+@media(max-width:600px){
+  .footerReference .footerLinks{
+    right:22px!important;
+    gap:2px!important;
+  }
+  .footerReference .footerPlainLink{
+    padding:1px 0!important;
+  }
+}
+</style>
+
+
+<style id="v244-footer-links-left-nowrap">
+/* Move the right-side link group further left without changing footer height. */
+.footerReference .footerLinks{
+  right:42px!important;
+  width:118px!important;
+}
+/* Keep every footer link label on one line, especially このアプリについて. */
+.footerReference .footerPlainLink{
+  width:max-content!important;
+  max-width:none!important;
+  white-space:nowrap!important;
+}
+.footerReference .footerPlainLink > span{
+  white-space:nowrap!important;
+}
+@media(max-width:600px){
+  .footerReference .footerLinks{
+    right:34px!important;
+    width:110px!important;
+  }
+}
+</style>
+
+
+<style id="v245-footer-right-position">
+.footerReference .footerLinks{
+  right:14px!important;
+  width:116px!important;
+}
+@media(max-width:600px){
+  .footerReference .footerLinks{
+    right:12px!important;
+    width:112px!important;
+  }
+}
+</style>
+
+
+<style id="v247-next-block-safe-layout">
+.nextBlockCard{overflow:hidden!important}
+.nextTop{align-items:center!important}
+.nextEyebrow.nextEyebrowImage{
+  width:202px!important;
+  max-width:58%!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+.nextEyebrowImage img{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  object-fit:contain!important;
+}
+.nextName,.nextMeta,.nextFilters,.progressTrack{
+  position:relative!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+.nextFilterBtn{flex:0 0 auto!important}
+@media(max-width:600px){
+  .nextEyebrow.nextEyebrowImage{width:185px!important;max-width:60%!important}
+}
+</style>
+
+
+<style id="v248-how-to-page">
+.howToPage{position:fixed;left:0;right:0;top:0;bottom:var(--footerH);z-index:120;background:#1689F4;overflow:auto;-webkit-overflow-scrolling:touch;padding-top:calc(var(--headerH) + env(safe-area-inset-top))}
+.howToPage[hidden]{display:none!important}
+.howToShell{min-height:100%;padding:10px 12px 76px;background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.16) 1.2px,transparent 1.3px) 0 0/10px 10px,#1689F4}
+.howToTopbar{display:flex;align-items:center;justify-content:center;margin:0 0 10px;padding:4px 2px;background:transparent;border:0;color:#fff}
+.howToTitle{text-align:center;font-weight:1000;font-size:18px;letter-spacing:.04em}
+.howToIntro,.howToDetail{background:#F7FCFF;border:3px solid #171717;border-radius:18px;box-shadow:0 5px 0 rgba(0,0,0,.22)}
+.howToIntro{padding:16px;margin-bottom:16px}
+.howToKicker{display:inline-block;padding:4px 8px;background:#FFE928;border:2px solid #171717;border-radius:6px;font-size:9px;font-weight:1000}
+.howToIntro h2{margin:9px 0 5px;font-size:20px}
+.howToIntro p{margin:0 0 13px;font-size:11px;line-height:1.65}
+.quickFlow{display:flex;align-items:stretch;justify-content:space-between;gap:4px}
+.quickStep{flex:1;min-width:0;background:#DDF1FF;border:2px solid #171717;border-radius:9px;padding:7px 4px;text-align:center}
+.quickStep b{display:block;font-size:10px;color:#0067B8}.quickStep span{font-size:8px;font-weight:900;line-height:1.25}.quickStep small{font-size:6px;font-weight:600}
+.quickArrow{display:flex;align-items:center;font-size:18px;font-weight:1000}
+.howToSectionTitle{margin:0 4px 8px;color:#fff;font-size:13px;font-weight:1000;text-shadow:1px 2px 0 rgba(0,0,0,.35)}
+.howToDetail{margin:0 0 10px;overflow:hidden}
+.howToDetail summary{list-style:none;display:grid;grid-template-columns:34px 1fr 22px;align-items:center;gap:8px;padding:11px 12px;cursor:pointer}
+.howToDetail summary::-webkit-details-marker{display:none}
+.howToNum{display:grid;place-items:center;width:30px;height:30px;background:#FFE928;border:2px solid #171717;border-radius:7px;font-size:9px;font-weight:1000}
+.howToDetail summary b{display:block;font-size:11px}.howToDetail summary small{display:block;margin-top:2px;font-size:7px;opacity:.65}
+.howToChevron{font-size:17px;font-weight:1000;text-align:center}.howToDetail[open] .howToChevron{transform:rotate(45deg)}
+.howToBody{border-top:2px solid #171717;padding:11px 12px 13px;background:#fff}
+.howToBody p{font-size:9px;line-height:1.7;margin:8px 1px 0}
+.howToShot{min-height:76px;border:2px dashed #1689F4;border-radius:10px;background:#DDF1FF;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.howToShot span{font-size:10px;font-weight:1000}.howToShot small{font-size:7px;margin-top:3px;opacity:.55}
+.miniGuideGrid{display:grid;gap:7px}.miniGuideGrid div{padding:9px;background:#DDF1FF;border:2px solid #171717;border-radius:9px}.miniGuideGrid b{display:block;font-size:9px}.miniGuideGrid small{display:block;margin-top:3px;font-size:7px;line-height:1.5}
+.howToNote{padding:12px 8px 0;text-align:center;color:rgba(255,255,255,.72);font-size:7px;line-height:1.6}
+</style>
+
+
+<style id="v249-shared-chrome">
+body.howToOpen main,body.howToOpen #homeScreen,body.howToOpen .homeScreen{visibility:hidden}
+body.howToOpen footer,body.howToOpen .footer,body.howToOpen #footer{visibility:visible!important}
+body.howToOpen .terrain,body.howToOpen .landscape,body.howToOpen .footerLandscape,body.howToOpen .terrainStrip{visibility:visible!important;z-index:130}
+body.howToOpen header,body.howToOpen .topbar,body.howToOpen .appHeader{visibility:visible!important;z-index:9500}
+</style>
+
+<style id="v249-chrome-vars">:root{--headerH:70px;--footerH:150px}</style>
+
+<style id="v252-result-footer-spacing">
+/* 解析結果の最終カード下～フッター上の地形画像までの余白を圧縮 */
+#results,
+.results,
+.resultList,
+.resultsList,
+.analysisResults,
+#analysisResults {
+  margin-bottom: 8px !important;
+  padding-bottom: 0 !important;
+}
+#results > :last-child,
+.results > :last-child,
+.resultList > :last-child,
+.resultsList > :last-child,
+.analysisResults > :last-child,
+#analysisResults > :last-child {
+  margin-bottom: 0 !important;
+}
+
+/* 解析画面本体に大きな下余白が設定されている場合も詰める */
+body:not(.howToOpen) .main,
+body:not(.howToOpen) main,
+body:not(.howToOpen) .content,
+body:not(.howToOpen) .appContent {
+  padding-bottom: 16px;
+}
+</style>
+
+
+
+<style id="v256-collapsible-fixed-footer">
+:root{
+  --mcbaFooterActualH: 132px;
+  --mcbaTerrainActualH: 108px;
+  --footerBreathingRoom: 0px;
+}
+
+/* 地形＋フッターを共通の固定ドックとして扱う */
+.appFooter#appFooter{
+  position:fixed!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  z-index:5000!important;
+  margin:0!important;
+  padding:0!important;
+  max-width:none!important;
+}
+.footerLandscape{
+  position:fixed!important;
+  left:0!important;
+  right:0!important;
+  bottom:var(--mcbaFooterActualH)!important;
+  z-index:4990!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  line-height:0!important;
+  pointer-events:none!important;
+}
+.footerLandscape img{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  margin:0!important;
+  padding:0!important;
+}
+
+/* 固定ドックに本文が潜らず、地形の直上に少しだけ余白を残す */
+.wrap,
+main,
+.main,
+.content,
+.appContent,
+#uploadView,
+#resultsView,
+.howToPage .howToShell{
+  padding-bottom:calc(
+    var(--mcbaFooterActualH) +
+    var(--mcbaTerrainActualH) +
+    var(--footerBreathingRoom)
+  )!important;
+}
+.howToPage{bottom:0!important}
+
+/* 折り畳みボタン */
+.footerToggle{
+  position:absolute!important;
+  top:7px!important;
+  right:14px!important;
+  z-index:6!important;
+  width:28px!important;
+  height:24px!important;
+  min-width:28px!important;
+  min-height:24px!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  background:transparent!important;
+  border:0!important;
+  border-bottom:2px solid rgba(255,255,255,.66)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  color:rgba(255,255,255,.78)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.78)!important;
+  font-size:18px!important;
+  font-weight:900!important;
+  line-height:1!important;
+}
+
+/* 収納時は「戻る」と開閉ボタンだけを残す */
+body.footerCollapsed .footerCard.footerReference{
+  min-height:42px!important;
+  height:42px!important;
+  padding:0!important;
+  display:block!important;
+  overflow:hidden!important;
+}
+body.footerCollapsed .footerHistoryBlock,
+body.footerCollapsed .footerBrand,
+body.footerCollapsed .footerLinks{
+  display:none!important;
+}
+body.footerCollapsed .footerBackTop{
+  top:9px!important;
+}
+body.footerCollapsed .footerToggle{
+  top:8px!important;
+}
+</style>
+
+
+
+
+
+<style id="v262-top-gap-fix">
+body:not(.howToOpen) .wrap{padding-top:10px!important;padding-bottom:0!important;min-height:0!important;height:auto!important}
+body:not(.howToOpen) #uploadView{display:block!important;min-height:0!important;height:auto!important;padding-top:0!important;padding-bottom:0!important;margin-top:0!important;align-content:initial!important;justify-content:initial!important}
+body:not(.howToOpen) #uploadView > :first-child{margin-top:0!important}
+</style>
+
+<style id="v199-db-actions-grid-fix">
+/* v199: Database home actions are always a balanced 2 x 2 grid. */
+.dbPanel .dbActions{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:14px!important;
+  align-items:stretch!important;
+}
+.dbPanel .dbActions>button{
+  width:100%!important;
+  min-width:0!important;
+  height:100%!important;
+  min-height:54px!important;
+  margin:0!important;
+}
+.dbPanel .dbActions>.small,
+.dbPanel .dbActions>#dbRestoreFile{
+  grid-column:1/-1!important;
+}</style>
+<style id="v218-slim-balanced-header">
+/* v218: reduce only the excess vertical header space while preserving the compact 3-column layout. */
+:root{--appHeaderH:88px!important;--cameraClearance:16px!important}
+.appFixedHeader{
+  min-height:88px!important;
+  grid-template-columns:118px minmax(0,1fr) 46px!important;
+  grid-template-rows:46px!important;
+  gap:8px!important;
+  padding-top:calc(env(safe-area-inset-top) + var(--cameraClearance))!important;
+  padding-bottom:6px!important;
+  padding-left:max(10px,env(safe-area-inset-left))!important;
+  padding-right:max(10px,env(safe-area-inset-right))!important;
+}
+.appBrandTextLogo.heroBrand{width:118px!important;height:46px!important}
+.headerDirectLogo{width:112px!important;max-height:44px!important}
+.appSearchWrap{height:42px!important}
+.menuButton{width:42px!important;height:42px!important;min-height:42px!important}
+.appSearchResults{top:49px!important}
+body{padding-top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 14px)!important}
+#editModal,#dbManagerModal,#dictManagerModal{top:calc(var(--appHeaderH) + env(safe-area-inset-top))!important}
+#loupeWrap{top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 10px)!important}
+@media(max-width:430px){
+  :root{--appHeaderH:82px!important;--cameraClearance:14px!important}
+  .appFixedHeader{
+    min-height:82px!important;
+    grid-template-columns:104px minmax(0,1fr) 42px!important;
+    grid-template-rows:44px!important;
+    gap:6px!important;
+    padding-bottom:5px!important;
+    padding-left:max(8px,env(safe-area-inset-left))!important;
+    padding-right:max(8px,env(safe-area-inset-right))!important;
+  }
+  .appBrandTextLogo.heroBrand{width:104px!important;height:44px!important}
+  .headerDirectLogo{width:100px!important;max-height:42px!important}
+  .appSearchWrap{height:40px!important}
+  .menuButton{width:40px!important;height:40px!important;min-height:40px!important}
+  .appSearchResults{top:47px!important;right:-47px!important;width:min(330px,calc(100vw - 16px))!important}
+}
+</style>
+<style id="v219-camera-edge-header">
+/* v219: trim the remaining top clearance; keep only a near-camera safety margin. */
+:root{--appHeaderH:80px!important;--cameraClearance:8px!important}
+.appFixedHeader{
+  min-height:80px!important;
+  grid-template-rows:44px!important;
+  padding-top:calc(env(safe-area-inset-top) + var(--cameraClearance))!important;
+  padding-bottom:4px!important;
+}
+.appBrandTextLogo.heroBrand{height:44px!important}
+.headerDirectLogo{max-height:42px!important}
+body{padding-top:calc(var(--appHeaderH) + env(safe-area-inset-top) + 12px)!important}
+@media(max-width:430px){
+  :root{--appHeaderH:74px!important;--cameraClearance:6px!important}
+  .appFixedHeader{
+    min-height:74px!important;
+    grid-template-rows:42px!important;
+    padding-top:calc(env(safe-area-inset-top) + var(--cameraClearance))!important;
+    padding-bottom:3px!important;
+  }
+  .appBrandTextLogo.heroBrand{height:42px!important}
+  .headerDirectLogo{max-height:40px!important}
+  .appSearchWrap{height:38px!important}
+  .menuButton{width:38px!important;height:38px!important;min-height:38px!important}
+  .appSearchResults{top:45px!important}
+}
+</style>
+
+<style id="addon-page-v266">
+.addonsPageMain{max-width:1080px;margin:0 auto;padding:0 16px 2px;}
+.addonsShell{display:grid;gap:26px}
+.addonsHeading{display:flex;align-items:end;justify-content:space-between;gap:16px;padding:22px;border:4px solid #171717;border-radius:24px;background:#fff;box-shadow:0 7px 0 rgba(23,23,23,.2)}
+.addonsHeading h1{margin:4px 0 6px;font-family:"BestTen CRT","Courier New",monospace;font-size:34px}
+.addonsHeading p,.addonGroupHead p{margin:0;color:#526474}
+.addonsKicker,.addonType,.mcCompat,.addonVersion{display:inline-flex;align-items:center;border:2px solid #171717;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:900;background:#FFE928}
+.mcCompat{background:#DDF1FF}
+.addonGroup{display:grid;gap:14px}
+.addonGroupHead{display:flex;justify-content:space-between;align-items:end;gap:16px}
+.addonGroupHead h2{margin:6px 0 2px;font-family:"BestTen CRT","Courier New",monospace;font-size:26px}
+.seriesSelection{display:flex;align-items:center;gap:10px}
+.seriesSelection button,.addonActions a,.addonActions button{min-height:42px;border:3px solid #171717;border-radius:12px;box-shadow:0 3px 0 #171717;padding:9px 13px;font-weight:800;text-decoration:none;color:#171717;background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.seriesSelection button,.addonActions .primary{background:#FFE928}
+.seriesSelection button:disabled{opacity:.45;cursor:default}
+.seriesGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.addonCard{position:relative;display:grid;grid-template-columns:108px minmax(0,1fr);gap:16px;padding:18px;border:4px solid #171717;border-radius:22px;background:#fff;box-shadow:0 6px 0 rgba(23,23,23,.18)}
+.utilityCard{grid-template-columns:150px minmax(0,1fr);border-top:8px solid #FFE928}
+.addonIcon{width:108px;height:108px;object-fit:cover;border:3px solid #171717;border-radius:18px}
+.utilityCard .addonIcon{width:150px;height:150px}
+.addonInfo{min-width:0}.addonTitleRow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.addonTitleRow h3{margin:0;font-family:"BestTen CRT","Courier New",monospace;font-size:22px}
+.addonInfo p{margin:8px 0 10px;font-size:13px;line-height:1.7}
+.addonNotes{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.addonNotes span{padding:5px 8px;border:2px solid #171717;border-radius:9px;background:#DDF1FF;font-size:11px;font-weight:800}
+.addonWarning,.allSeriesNotice{padding:9px 11px;border:2px solid #171717;border-radius:11px;background:#FFF2C9;font-size:11px;line-height:1.6}
+.allSeriesNotice{background:#DDF1FF}
+.addonActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.addonHistory{margin-top:10px;padding:10px;border:2px dashed #8798A5;border-radius:10px;background:#F7FBFF;font-size:11px}.addonHistory p{margin:0}
+.addonSelect{position:absolute;top:10px;left:10px;z-index:2;display:flex;align-items:center;gap:4px;padding:4px 7px;border:2px solid #171717;border-radius:9px;background:#fff;font-size:10px;font-weight:900;box-shadow:1px 2px 0 #171717}
+.seriesCard .addonIcon{margin-top:28px}.footnote{text-align:center;color:#5d6a72;font-size:11px;padding:8px}
+@media(max-width:760px){.addonsPageMain{padding:0 10px 2px}.seriesGrid{grid-template-columns:1fr}.addonsHeading,.addonGroupHead{align-items:stretch;flex-direction:column}.seriesSelection{justify-content:space-between}.addonCard,.utilityCard{grid-template-columns:78px minmax(0,1fr);padding:14px;gap:12px}.addonIcon,.utilityCard .addonIcon{width:78px;height:78px;border-radius:14px}.seriesCard .addonIcon{margin-top:28px}.addonTitleRow{align-items:flex-start}.addonTitleRow h3{font-size:18px}.addonInfo p{font-size:11px}}
+</style>
+</head>
+<body>
+<header class="appFixedHeader" id="appFixedHeader">
+  <div class="appBrandTextLogo heroBrand" aria-label="Minecraft Block Analyzer">
+    <img src="./header-logo.png" class="headerDirectLogo" alt="Minecraft Block Analyzer">
+  </div>
+  <div class="appSearchWrap">
+    <span class="searchIcon" aria-hidden="true">⌕</span>
+    <input id="appSearch" class="appSearch" type="search" autocomplete="off" spellcheck="false" placeholder="アプリ内検索…" aria-label="アプリ内検索">
+    <button id="clearAppSearch" class="clearAppSearch" type="button" aria-label="検索を消去">×</button>
+    <div id="appSearchResults" class="appSearchResults" role="listbox"></div>
+  </div>
+  <div class="menuWrap">
+    <button class="menuButton" id="menuButton" type="button" aria-label="メニュー" aria-expanded="false">☰</button>
+    <div class="menuDropdown" id="menuDropdown">
+      <button id="menuHome" type="button">⌂　ホーム</button>
+      <button id="menuAddons" type="button">▣　Add-On</button>
+      <button id="menuSettings" type="button">⚙　設定</button>
+    </div>
+  </div>
+</header>
+<main class="addonsPageMain"><div class="addonsShell"><div class="addonsHeading"><div><span class="addonsKicker">MBA ADD-ONS</span><h1>Add-On</h1><p>MBA UtilityとMBA Seriesの最新版・旧版を管理します。</p></div><span class="mcCompat">Bedrock Edition V26.45</span></div>
+<section class="addonGroup"><div class="addonGroupHead"><div><span class="addonType">統合版</span><h2>MBA Utility</h2></div></div><article class="addonCard utilityCard"><img class="addonIcon" src="./addon-assets/MBA_Utility.png" alt="MBA Utility"><div class="addonInfo"><div class="addonTitleRow"><h3>MBA Utility</h3><span class="addonVersion">26.6.8</span></div><p>MBA Seriesの各機能を1つに統合した総合Utility Add-On。情報確認、撮影支援、探索・地点管理、視覚調整、便利クラフト、特殊ブロック回収、植物クラフトなどをまとめて利用できます。</p><div class="addonNotes"><span>Studio：紙</span><span>Explorer：紙</span></div><div class="addonWarning">MBA Seriesの各機能を含む統合版です。同一機能の個別版との併用は推奨しません。</div><div class="addonActions"><button class="primary addonDownload" type="button" data-file="MBA_Utility_26.6.8.mcaddon">最新版をダウンロード</button><button class="historyToggle" type="button" data-history="utilityHistory">旧版</button></div><div id="utilityHistory" class="addonHistory" hidden><p>現在、掲載している旧版はありません。今後の更新から履歴を残します。</p></div></div></article></section>
+<section class="addonGroup"><div class="addonGroupHead"><div><span class="addonType">個別選択版</span><h2>MBA Series</h2><p>必要な機能だけ選択して導入できます。</p></div><div class="seriesSelection"><b id="seriesSelectedCount">0件選択中</b><button id="downloadSelectedAddons" type="button" disabled>選択中をダウンロード</button></div></div><div id="allSeriesNotice" class="allSeriesNotice" hidden>7種すべてを使用する場合はMBA Utilityも利用できます。UtilityではStudioとExplorerのメニューをどちらも紙から開きます。</div><div class="seriesGrid"><article class="addonCard seriesCard"><label class="addonSelect"><input type="checkbox" class="seriesCheck" data-file="MBA_Insight_26.6.8.mcaddon"><span>選択</span></label><img class="addonIcon" src="./addon-assets/MBA_Insight.png" alt="MBA Insight"><div class="addonInfo"><div class="addonTitleRow"><h3>MBA Insight</h3><span class="addonVersion">26.6.8</span></div><p>ブロックやMobなど、プレイヤーが見ている対象の情報をHUDへ表示する解析・情報確認Add-On。対象の名前、ID、HP、タグ、バイオームなどを確認する用途。</p><div class="addonActions"><button class="addonDownload" type="button" data-file="MBA_Insight_26.6.8.mcaddon">個別ダウンロード</button><button class="historyToggle" type="button" data-history="historyInsight">旧版</button></div><div id="historyInsight" class="addonHistory" hidden><p>現在、掲載している旧版はありません。今後の更新から履歴を残します。</p></div></div></article>
+<article class="addonCard seriesCard"><label class="addonSelect"><input type="checkbox" class="seriesCheck" data-file="MBA_Studio_26.6.8.mcaddon"><span>選択</span></label><img class="addonIcon" src="./addon-assets/MBA_Studio.png" alt="MBA Studio"><div class="addonInfo"><div class="addonTitleRow"><h3>MBA Studio</h3><span class="addonVersion">26.6.8</span></div><p>Minecraft内でブロック等を撮影するための撮影支援Add-On。撮影スタジオの設置・撤収、固定カメラ、FOV変更、撮影対象の配置などを行う。</p><div class="addonNotes"><span>紙を使用してメニューを開く</span></div><div class="addonActions"><button class="addonDownload" type="button" data-file="MBA_Studio_26.6.8.mcaddon">個別ダウンロード</button><button class="historyToggle" type="button" data-history="historyStudio">旧版</button></div><div id="historyStudio" class="addonHistory" hidden><p>現在、掲載している旧版はありません。今後の更新から履歴を残します。</p></div></div></article>
+<article class="addonCard seriesCard"><label class="addonSelect"><input type="checkbox" class="seriesCheck" data-file="MBA_Explorer_26.6.8.mcaddon"><span>選択</span></label><img class="addonIcon" src="./addon-assets/MBA_Explorer.png" alt="MBA Explorer"><div class="addonInfo"><div class="addonTitleRow"><h3>MBA Explorer</h3><span class="addonVersion">26.6.8</span></div><p>探索・地点管理を支援するAdd-On。地点の登録・編集・案内、初期スポーン地点管理、バニラおよびBiomes O' Plentyのバイオーム検索などを行う。</p><div class="addonNotes"><span>アメジストの欠片を使用してメニューを開く</span></div><div class="addonActions"><button class="addonDownload" type="button" data-file="MBA_Explorer_26.6.8.mcaddon">個別ダウンロード</button><button class="historyToggle" type="button" data-history="historyExplorer">旧版</button></div><div id="historyExplorer" class="addonHistory" hidden><p>現在、掲載している旧版はありません。今後の更新から履歴を残します。</p></div></div></article>
+<article class="addonCard seriesCard"><label class="addonSelect"><input type="checkbox" class="seriesCheck" data-file="MBA_Visuals_26.6.8.mcaddon"><span>選択</span></label><img class="addonIcon" src="./addon-assets/MBA_Visuals.png" alt="MBA Visuals"><div class="addonInfo"><div class="addonTitleRow"><h3>MBA Visuals</h3><span class="addonVersion">26.6.8</span></div><p>Minecraftの見た目やUIを改善するResource Pack系Add-On。バイオームごとのFog、天候・環境表現、各種UI、チャット、インベントリ画面などの視覚的な調整をまとめたもの。</p><div class="addonActions"><button class="addonDownload" type="button" data-file="MBA_Visuals_26.6.8.mcaddon">個別ダウンロード</button><button class="historyToggle" type="button" data-history="historyVisuals">旧版</button></div><div id="historyVisuals" class="addonHistory" hidden><p>現在、掲載している旧版はありません。今後の更新から履歴を残します。</p></div></div></article>
+<article class="addonCard seriesCard"><label class="addonSelect"><input type="checkbox" class="seriesCheck" data-file="MBA_Crafting_26.6.8.mcaddon"><span>選択</span></label><img class="addonIcon" src="./addon-assets/MBA_Crafting.png" alt="MBA Crafting"><div class="addonInfo"><div class="addonTitleRow"><h3>MBA Crafting</h3><span class="addonVersion">26.6.8</span></div><p>クラフトの利便性を改善するAdd-On。階段・ハーフブロック・壁を元ブロックへ戻す逆クラフト、染め直し、素材変換、配置自由化など、多数の便利レシピを追加する。</p><div class="addonActions"><button class="addonDownload" type="button" data-file="MBA_Crafting_26.6.8.mcaddon">個別ダウンロード</button><button class="historyToggle" type="button" data-history="historyCrafting">旧版</button></div><div id="historyCrafting" class="addonHistory" hidden><p>現在、掲載している旧版はありません。今後の更新から履歴を残します。</p></div></div></article>
+<article class="addonCard seriesCard"><label class="addonSelect"><input type="checkbox" class="seriesCheck" data-file="MBA_Recovery_26.6.8.mcaddon"><span>選択</span></label><img class="addonIcon" src="./addon-assets/MBA_Recovery.png" alt="MBA Recovery"><div class="addonInfo"><div class="addonTitleRow"><h3>MBA Recovery</h3><span class="addonVersion">26.6.8</span></div><p>通常のサバイバルでは回収できない、または回収しにくい特殊ブロックを入手可能にするAdd-On。岩盤、強化された深層岩、芽生えたアメジストなどの特殊回収機能を担当する。</p><div class="addonActions"><button class="addonDownload" type="button" data-file="MBA_Recovery_26.6.8.mcaddon">個別ダウンロード</button><button class="historyToggle" type="button" data-history="historyRecovery">旧版</button></div><div id="historyRecovery" class="addonHistory" hidden><p>現在、掲載している旧版はありません。今後の更新から履歴を残します。</p></div></div></article>
+<article class="addonCard seriesCard"><label class="addonSelect"><input type="checkbox" class="seriesCheck" data-file="MBA_Botany_26.6.8.mcaddon"><span>選択</span></label><img class="addonIcon" src="./addon-assets/MBA_Botany.png" alt="MBA Botany"><div class="addonInfo"><div class="addonTitleRow"><h3>MBA Botany</h3><span class="addonVersion">26.6.8</span></div><p>樹木・苗木・植物関連のクラフトを拡張するAdd-On。苗木やツツジを焼いて枯れ木へ変換し、葉＋枯れ木から対応する苗木を作成できる。バニラだけでなくBiomes O' Plentyの樹木にも対応。背の低い草×2→背の高い草、シダ×2→大きなシダなどの植物クラフトも含む。</p><div class="addonActions"><button class="addonDownload" type="button" data-file="MBA_Botany_26.6.8.mcaddon">個別ダウンロード</button><button class="historyToggle" type="button" data-history="historyBotany">旧版</button></div><div id="historyBotany" class="addonHistory" hidden><p>現在、掲載している旧版はありません。今後の更新から履歴を残します。</p></div></div></article></div></section><div class="footnote">現在の対応バージョン：Bedrock Edition V26.45</div></div></main>
+<div class="footerLandscape" aria-hidden="true"><img src="./footer-landscape.png" alt=""></div>
+
+<footer class="appFooter" id="appFooter">
+  <div class="footerCard footerReference">
+    <button class="footerToggle" id="footerToggle" type="button" aria-expanded="true" aria-label="フッターを折り畳む">⌄</button>
+    <button class="footerBack footerBackTop" id="globalFooterBack" type="button" aria-label="戻る">↶ <span>戻る</span></button>
+
+    <section class="footerHistoryBlock" aria-label="最新の更新履歴">
+      <div class="footerHead">
+        <strong><img class="footerTitleIcon" src="./footer-history-icon.png" alt="">最新の更新履歴</strong>
+        <span class="footerDivider">|</span>
+        <button class="footerMore" id="showHistory" type="button">もっと見る ›</button>
+      </div>
+      <div class="updateList">
+        <div class="updateRow"><span class="updateTag">v263</span><div class="updateText"><b>コード整理・上部余白を根本修正</b></div></div>
+        <div class="updateRow"><span class="updateTag">v257</span><div class="updateText"><b>バックアップ出力・下部余白を整理</b></div></div>
+        <div class="updateRow"><span class="updateTag">v256</span><div class="updateText"><b>折り畳み固定フッターを実装</b></div></div>
+      </div>
+    </section>
+
+    <div class="footerBrand" aria-label="MBA">
+      <img src="./footer-mba-icon.png" alt="">
+    </div>
+
+    <nav class="footerLinks" aria-label="フッターリンク">
+      <button type="button" class="footerPlainLink" id="openHowTo"><img class="footerLinkImg" src="./footer-help-icon.png" alt=""><span>使い方</span></button>
+      <button type="button" class="footerPlainLink"><img class="footerLinkImg" src="./footer-about-icon.png" alt=""><span>このアプリについて</span></button>
+      <button type="button" class="footerPlainLink"><img class="footerLinkImg" src="./footer-terms-icon.png" alt=""><span>利用規約</span></button>
+      <button type="button" class="footerPlainLink"><img class="footerLinkImg" src="./footer-operator-icon.png" alt=""><span>運　営</span></button>
+    </nav>
+  </div>
+</footer>
+<div class="historySheet" id="historySheet"><div class="historyCard">
+  <div class="historyTitle"><h2>更新履歴</h2><button class="historyClose" id="closeHistory" type="button">閉じる</button></div>
+  <div class="historyEntries"><div class="historyEntry"><b>v267｜Add-Onページのフッター折り畳みとファイル出力を修正</b></div><div class="historyEntry"><b>v266｜Add-Onページを全ページ共通のヘッダー・地形・フッター構成へ統一</b></div><div class="historyEntry"><b>v265｜Add-On専用ページを追加</b></div><div class="historyEntry"><b>v263｜コード整理・上部余白を根本修正</b></div></div>
+</div></div>
+
+<script>
+const menuButton=document.getElementById('menuButton');
+const menuDropdown=document.getElementById('menuDropdown');
+menuButton.addEventListener('click',e=>{e.stopPropagation();const open=!menuDropdown.classList.contains('open');menuDropdown.classList.toggle('open',open);menuButton.setAttribute('aria-expanded',String(open));});
+document.addEventListener('click',e=>{if(!menuDropdown.contains(e.target)&&e.target!==menuButton){menuDropdown.classList.remove('open');menuButton.setAttribute('aria-expanded','false');}});
+document.getElementById('menuHome').addEventListener('click',()=>location.href='./index.html');
+document.getElementById('menuAddons').addEventListener('click',()=>location.href='./addons.html');
+document.getElementById('menuSettings').addEventListener('click',()=>location.href='./index.html#settings');
+
+const search=document.getElementById('appSearch');
+const clearSearch=document.getElementById('clearAppSearch');
+const cards=[...document.querySelectorAll('.addonCard')];
+function applySearch(){const q=search.value.trim().toLowerCase();cards.forEach(card=>{card.style.display=!q||card.textContent.toLowerCase().includes(q)?'grid':'none';});clearSearch.style.visibility=q?'visible':'hidden';}
+search.addEventListener('input',applySearch);clearSearch.addEventListener('click',()=>{search.value='';applySearch();search.focus();});applySearch();
+
+const checks=[...document.querySelectorAll('.seriesCheck')];
+function refresh(){const s=checks.filter(c=>c.checked);document.getElementById('seriesSelectedCount').textContent=`${s.length}件選択中`;document.getElementById('downloadSelectedAddons').disabled=!s.length;document.getElementById('allSeriesNotice').hidden=s.length!==checks.length}
+checks.forEach(c=>c.addEventListener('change',refresh));
+document.querySelectorAll('.historyToggle').forEach(b=>b.addEventListener('click',()=>{const e=document.getElementById(b.dataset.history);e.hidden=!e.hidden;b.textContent=e.hidden?'旧版':'閉じる'}));
+// Add-On配布は共有シートを使わず、通常のブラウザダウンロードとして扱う。
+// iOS/PWAでWeb Share APIに.mcaddonを渡すと共有UIが即座に閉じる環境があるため。
+function downloadStaticAddon(name){
+  const a=document.createElement('a');
+  a.href='./addon-downloads/'+encodeURIComponent(name);
+  a.download=name;
+  a.rel='noopener';
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>a.remove(),1000);
+}
+
+function downloadBlob(blob,name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=name;
+  a.rel='noopener';
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},30000);
+}
+
+async function loadAddonFile(name){
+  const r=await fetch('./addon-downloads/'+encodeURIComponent(name),{cache:'no-store'});
+  if(!r.ok) throw new Error(name+' '+r.status);
+  const buf=await r.arrayBuffer();
+  return new Uint8Array(buf);
+}
+
+// 外部ライブラリなしで選択したmcaddonをZIP化する。
+const crcTable=(()=>{let t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u8){let c=0xffffffff;for(const b of u8)c=crcTable[(c^b)&255]^(c>>>8);return(c^0xffffffff)>>>0}
+function u16(n){return [n&255,(n>>>8)&255]}
+function u32(n){return [n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255]}
+function makeStoreZip(files){const enc=new TextEncoder(),parts=[],central=[];let off=0;for(const f of files){const name=enc.encode(f.name),data=f.data,crc=crc32(data);const local=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...name]);parts.push(local,data);const cen=new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off),...name]);central.push(cen);off+=local.length+data.length}const csize=central.reduce((a,b)=>a+b.length,0),end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(csize),...u32(off),...u16(0)]);return new Blob([...parts,...central,end],{type:'application/zip'})}
+
+document.querySelectorAll('.addonDownload').forEach(btn=>btn.addEventListener('click',()=>{
+  downloadStaticAddon(btn.dataset.file);
+}));
+
+document.getElementById('downloadSelectedAddons').addEventListener('click',async()=>{
+  const selected=checks.filter(c=>c.checked);
+  if(!selected.length)return;
+  const btn=document.getElementById('downloadSelectedAddons'),old=btn.textContent;
+  btn.disabled=true;
+  btn.textContent='準備中…';
+  try{
+    const files=[];
+    for(const c of selected) files.push({name:c.dataset.file,data:await loadAddonFile(c.dataset.file)});
+    downloadBlob(makeStoreZip(files),'MBA_Series_Selected_26.6.8.zip');
+  }catch(err){
+    console.error(err);
+    alert('選択したAdd-OnのZIP作成に失敗しました。');
+  }finally{
+    btn.textContent=old;
+    refresh();
+  }
+});
+refresh();
+
+// ホームと同一のフッター折り畳みロジック。
+(function(){
+  const footer=document.getElementById('appFooter');
+  const terrain=document.querySelector('.footerLandscape');
+  const toggle=document.getElementById('footerToggle');
+  if(!footer||!terrain||!toggle)return;
+  const KEY='mcba_footer_collapsed_v1';
+  function measureDock(){
+    const footerH=Math.ceil(footer.getBoundingClientRect().height);
+    const terrainH=Math.ceil(terrain.getBoundingClientRect().height);
+    document.documentElement.style.setProperty('--mcbaFooterActualH',footerH+'px');
+    document.documentElement.style.setProperty('--mcbaTerrainActualH',terrainH+'px');
+  }
+  function setCollapsed(collapsed,save){
+    document.body.classList.toggle('footerCollapsed',collapsed);
+    toggle.textContent=collapsed?'⌃':'⌄';
+    toggle.setAttribute('aria-expanded',collapsed?'false':'true');
+    toggle.setAttribute('aria-label',collapsed?'フッターを展開する':'フッターを折り畳む');
+    if(save){try{localStorage.setItem(KEY,collapsed?'1':'0')}catch(e){}}
+    requestAnimationFrame(()=>{measureDock();requestAnimationFrame(measureDock)});
+  }
+  let initial=false;
+  try{initial=localStorage.getItem(KEY)==='1'}catch(e){}
+  setCollapsed(initial,false);
+  toggle.addEventListener('click',ev=>{
+    ev.preventDefault();
+    ev.stopPropagation();
+    setCollapsed(!document.body.classList.contains('footerCollapsed'),true);
+  });
+  if('ResizeObserver'in window){const ro=new ResizeObserver(measureDock);ro.observe(footer);ro.observe(terrain)}
+  window.addEventListener('resize',measureDock,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(measureDock,100));
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(measureDock);
+  measureDock();
+})();
+document.getElementById('globalFooterBack')?.addEventListener('click',()=>{if(history.length>1)history.back();else location.href='./index.html';});
+const sheet=document.getElementById('historySheet');
+document.getElementById('showHistory')?.addEventListener('click',()=>sheet?.classList.add('open'));
+document.getElementById('closeHistory')?.addEventListener('click',()=>sheet?.classList.remove('open'));
+sheet?.addEventListener('click',e=>{if(e.target===sheet)sheet.classList.remove('open')});
+document.getElementById('openHowTo')?.addEventListener('click',()=>location.href='./index.html#howto');
+</script>
+
+</body></html>
